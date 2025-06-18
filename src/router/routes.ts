@@ -61,7 +61,7 @@ const systemRoutes: RouteRecordRaw[] = [
 const asyncRoutes: Route.recordMainRaw[] = [
   {
     meta: {
-      title: '演示我',
+      title: '系统',
       icon: 'i-uim:box',
     },
     children: [
@@ -70,8 +70,8 @@ const asyncRoutes: Route.recordMainRaw[] = [
   },
   {
     meta: {
-      title: '系统设置',
-      icon: 'i-uim:settings',
+      title: '检测',
+      icon: 'streamline:industry-innovation-and-infrastructure',
     },
     children: [
       MultilevelMenuExample,

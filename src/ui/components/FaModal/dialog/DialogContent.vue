@@ -96,7 +96,7 @@ watch(showOverlay, (val) => {
         </button>
         <DialogClose
           v-if="closable"
-          class="rounded-sm bg-transparent opacity-70 ring-offset-background transition-opacity disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+          class="rounded-sm  opacity-70 ring-offset-background transition-opacity disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           <X class="h-4 w-4" />
           <span class="sr-only">Close</span>

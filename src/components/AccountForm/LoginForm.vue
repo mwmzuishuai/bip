@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
+import { onMounted, ref } from 'vue'
 import * as z from 'zod'
+import api from '@/api/modules/user'
 import useUserStore from '@/store/modules/user'
 import { FormControl, FormField, FormItem, FormMessage } from '@/ui/shadcn/ui/form'
 
@@ -29,15 +31,15 @@ const type = ref<'default' | 'qrcode'>('default')
 
 const form = useForm({
   validationSchema: toTypedSchema(z.object({
-    account: z.string().min(1, '请输入用户名'),
+    username: z.string().min(1, '请输入用户名'),
     password: z.string().min(1, '请输入密码'),
-    code: z.string().min(1, '请输入验证码'),
+    captcha: z.string().min(1, '请输入验证码'),
     remember: z.boolean(),
   })),
   initialValues: {
-    account: props.account ?? localStorage.getItem('login_account') ?? '',
+    username: props.account ?? localStorage.getItem('login_account') ?? '',
     password: '',
-    code: '',
+    captcha: '',
     remember: !!localStorage.getItem('login_account'),
   },
 })
@@ -45,17 +47,27 @@ const onSubmit = form.handleSubmit((values) => {
   loading.value = true
   userStore.login(values).then(() => {
     if (values.remember) {
-      localStorage.setItem('login_account', values.account)
+      localStorage.setItem('login_account', values.username)
     }
     else {
       localStorage.removeItem('login_account')
     }
-    emits('onLogin', values.account)
+    emits('onLogin', values.username)
   }).finally(() => {
     loading.value = false
   })
 })
-
+// 验证码生成
+const codeUrl = ref('')
+function onRefreshCode() {
+  api.getCaptcha().then((res) => {
+    // base 64
+    codeUrl.value = `data:image/png;base64,${res.data.image}`
+  })
+}
+onMounted(() => {
+  onRefreshCode()
+})
 // function testAccount(account: string) {
 //   form.setFieldValue('account', account)
 //   form.setFieldValue('password', '123456')
@@ -74,27 +86,21 @@ const onSubmit = form.handleSubmit((values) => {
       </p>
     </div>
     <div class="mb-4">
-      <FaTabs
-        v-model="type" :list="[
+      <FaTabs v-model="type" :list="[
           { label: '账号密码登录', value: 'default' },
         // { label: '扫码登录', value: 'qrcode' },
-        ]" class="inline-flex"
-      />
+        ]" class="inline-flex" />
     </div>
     <div v-show="type === 'default'">
       <form @submit="onSubmit">
-        <FormField v-slot="{ componentField, errors }" name="account">
+        <FormField v-slot="{ componentField, errors }" name="username">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput
-                type="text" placeholder="请输入用户名" class="w-full" :class="errors.length && 'border-destructive'"
-                v-bind="componentField"
-              />
+              <FaInput type="text" placeholder="请输入用户名" class="w-full" :class="errors.length && 'border-destructive'"
+                v-bind="componentField" />
             </FormControl>
-            <Transition
-              enter-active-class="transition-opacity" enter-from-class="opacity-0"
-              leave-active-class="transition-opacity" leave-to-class="opacity-0"
-            >
+            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0">
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -102,35 +108,27 @@ const onSubmit = form.handleSubmit((values) => {
         <FormField v-slot="{ componentField, errors }" name="password">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput
-                type="password" placeholder="请输入密码" class="w-full" :class="errors.length && 'border-destructive'"
-                v-bind="componentField"
-              />
+              <FaInput type="password" placeholder="请输入密码" class="w-full" :class="errors.length && 'border-destructive'"
+                v-bind="componentField" />
             </FormControl>
-            <Transition
-              enter-active-class="transition-opacity" enter-from-class="opacity-0"
-              leave-active-class="transition-opacity" leave-to-class="opacity-0"
-            >
+            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0">
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField, errors }" name="code">
+        <FormField v-slot="{ componentField, errors }" name="captcha">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
               <div class="flex-center-between">
-                <FaInput
-                  type="password" placeholder="请输入验证码" class="w-1xl"
-                  :class="errors.length && 'border-destructive'" v-bind="componentField"
-                />
+                <FaInput type="password" placeholder="请输入验证码" class="w-1xl"
+                  :class="errors.length && 'border-destructive'" v-bind="componentField" />
                 <!-- 验证图片 -->
-                <img src="@/assets/images/br_logo.svg" alt="点击刷新" class="h-[40px] w-[100px]">
+                <img :src="codeUrl" alt="点击刷新" title="点击刷新" class="h-[40px] w-[100px]" @click="onRefreshCode">
               </div>
             </FormControl>
-            <Transition
-              enter-active-class="transition-opacity" enter-from-class="opacity-0"
-              leave-active-class="transition-opacity" leave-to-class="opacity-0"
-            >
+            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0">
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -147,33 +145,16 @@ const onSubmit = form.handleSubmit((values) => {
               </FormItem>
             </FormField>
           </div>
-          <FaButton
-            variant="link" class="h-auto p-0" type="button"
-            @click="emits('onResetPassword', form.values.account)"
-          >
+          <FaButton variant="link" class="h-auto p-0" type="button"
+            @click="emits('onResetPassword', form.values.username)">
             忘记密码了?
           </FaButton>
         </div>
         <FaButton :loading="loading" size="lg" class="w-full" type="submit">
           登录
         </FaButton>
-        <!-- <div class="mt-4 flex-center gap-2 text-sm">
-          <span class="text-secondary-foreground op-50">还没有帐号?</span>
-          <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onRegister', form.values.account)">
-            注册新帐号
-          </FaButton>
-        </div> -->
       </form>
       <div class="mt-4 text-center -mb-4">
-        <!-- <FaDivider>演示账号一键登录</FaDivider> -->
-        <!-- <div class="space-x-2">
-          <FaButton variant="default" size="sm" plain @click="testAccount('admin')">
-            admin
-          </FaButton>
-          <FaButton variant="outline" size="sm" plain @click="testAccount('test')">
-            test
-          </FaButton>
-        </div> -->
       </div>
     </div>
     <div v-show="type === 'qrcode'">

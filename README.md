@@ -1,21 +1,6 @@
-<p align="center">
-  <img src="https://fantastic-admin.hurui.me/logo.svg" width="200" height="200" />
-</p>
+<h1 align="center">北人绿能能源管理系统</h1>
 
-<h1 align="center">Fantastic-admin</h1>
-
-<p align="center">一款<b>开箱即用</b>的 Vue3 中后台管理系统框架</p>
-
-<p align="center">
-  <a href="https://fantastic-admin.hurui.me" target="_blank">官网</a>
-  <span>&nbsp;|&nbsp;</span>
-  <a href="https://fantastic-admin.pages.dev" target="_blank">备用地址</a>
-<p>
-
-<p align="center">
-  <a href="###"><img src="https://img.shields.io/github/license/fantastic-admin/basic?label=%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE&style=flat-square" /></a>
-  <a href="https://github.com/fantastic-admin/basic/releases" target="_blank"><img src="https://img.shields.io/github/v/release/fantastic-admin/basic?label=%E5%BD%93%E5%89%8D%E7%89%88%E6%9C%AC&style=flat-square" /></a>
-</p>
+<p align="center">对于储能设备的检测，数据分析及管理的系统</p>
 
 ## 特点
 

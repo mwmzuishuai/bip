@@ -26,17 +26,14 @@ const useUserStore = defineStore(
     })
 
     // 登录
-    async function login(data: {
-      account: string
-      password: string
-    }) {
+    async function login(data:any) {
       const res = await apiUser.login(data)
-      localStorage.setItem('account', res.data.account)
-      localStorage.setItem('token', res.data.token)
+      localStorage.setItem('account', res.data.username)
+      localStorage.setItem('token', res.data.access_token)
       localStorage.setItem('avatar', res.data.avatar)
-      account.value = res.data.account
-      token.value = res.data.token
-      avatar.value = res.data.avatar
+      account.value = res.data.username||'小小'
+      token.value = res.data.access_token
+      avatar.value = res.data.avatar||''
     }
 
     // 手动登出

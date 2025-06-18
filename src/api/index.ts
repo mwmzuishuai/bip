@@ -28,7 +28,7 @@ api.interceptors.request.use(
     // 设置请求头
     if (request.headers) {
       if (userStore.isLogin) {
-        request.headers.Token = userStore.token
+        request.headers.authorization ='Bearer ' +userStore.token
       }
     }
     // 是否将 POST 请求参数进行字符串化处理
@@ -43,6 +43,7 @@ api.interceptors.request.use(
 
 // 处理错误信息的函数
 function handleError(error: any) {
+  // 处理错误逻辑
   if (error.status === 401) {
     useUserStore().requestLogout()
     throw error
@@ -55,7 +56,7 @@ function handleError(error: any) {
     message = '接口请求超时'
   }
   else if (message.includes('Request failed with status code')) {
-    message = `接口${message.substr(message.length - 3)}异常`
+    message = error.response.data.message
   }
   toast.error('Error', {
     description: message,

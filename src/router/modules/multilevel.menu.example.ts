@@ -5,63 +5,45 @@ function Layout() {
 }
 
 const routes: RouteRecordRaw = {
-  path: '/multilevel_menu_example',
+  path: '/system',
   component: Layout,
-  name: 'multilevelMenuExample',
+  name: 'system',
   meta: {
-    title: '多级导航s',
+    title: '系统管理',
     icon: 'i-heroicons-solid:menu-alt-3',
   },
   children: [
     {
-      path: 'page',
-      name: 'multilevelMenuExample1',
-      component: () => import('@/views/multilevel_menu_example/page.vue'),
+      path: 'role',
+      name: 'role',
+      component: () => import('@/views/system/role.vue'),
       meta: {
-        title: '导航1',
+        title: '角色管理',
       },
     },
     {
-      path: 'level2',
-      name: 'multilevelMenuExample2',
+      path: 'menu',
+      name: 'menu',
+      component: () => import('@/views/system/menu.vue'),
       meta: {
-        title: '导航2',
+        title: '菜单管理',
       },
-      children: [
-        {
-          path: 'page',
-          name: 'multilevelMenuExample2-1',
-          component: () => import('@/views/multilevel_menu_example/level2/page.vue'),
-          meta: {
-            title: '导航2-1',
-          },
-        },
-        {
-          path: 'level3',
-          name: 'multilevelMenuExample2-2',
-          meta: {
-            title: '导航2-2',
-          },
-          children: [
-            {
-              path: 'page1',
-              name: 'multilevelMenuExample2-2-1',
-              component: () => import('@/views/multilevel_menu_example/level2/level3/page1.vue'),
-              meta: {
-                title: '导航2-2-1',
-              },
-            },
-            {
-              path: 'page2',
-              name: 'multilevelMenuExample2-2-2',
-              component: () => import('@/views/multilevel_menu_example/level2/level3/page2.vue'),
-              meta: {
-                title: '导航2-2-2',
-              },
-            },
-          ],
-        },
-      ],
+    },
+    {
+      path: 'dept',
+      name: 'dept',
+      component: () => import('@/views/system/dept.vue'),
+      meta: {
+        title: '部门管理',
+      },
+    },
+    {
+      path: 'user',
+      name: 'user',
+      component: () => import('@/views/system/user.vue'),
+      meta: {
+        title: '用户管理',
+      },
     },
   ],
 }
