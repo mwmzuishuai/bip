@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import imgLogo from '@/assets/images/logo.svg'
+import imgLogo from '@/assets/images/br_logo.svg'
 import useSettingsStore from '@/store/modules/settings'
 
 defineOptions({

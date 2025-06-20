@@ -25,6 +25,7 @@ api.interceptors.request.use(
   (request) => {
     // 全局拦截请求发送前提交的参数
     const userStore = useUserStore()
+
     // 设置请求头
     if (request.headers) {
       if (userStore.isLogin) {
@@ -72,17 +73,7 @@ api.interceptors.response.use(
      * 规则是当 status 为 1 时表示请求成功，为 0 时表示接口需要登录或者登录状态失效，需要重新登录
      * 请求出错时 error 会返回错误信息
      */
-    if (response.data.status === 1) {
-      if (response.data.error !== '') {
-        toast.warning('Warning', {
-          description: response.data.error,
-        })
-        return Promise.reject(response.data)
-      }
-    }
-    else {
-      useUserStore().requestLogout()
-    }
+    const userStore = useUserStore()
     return Promise.resolve(response.data)
   },
   async (error) => {
@@ -91,7 +82,9 @@ api.interceptors.response.use(
 
     // 如果配置不存在或未启用重试，则直接处理错误
     if (!config || !config.retry) {
+
       return handleError(error)
+
     }
 
     // 设置重试次数
@@ -99,7 +92,10 @@ api.interceptors.response.use(
 
     // 判断是否超过重试次数
     if (config.retryCount >= MAX_RETRY_COUNT) {
+      console.log(2);
+
       return handleError(error)
+
     }
 
     // 重试次数自增

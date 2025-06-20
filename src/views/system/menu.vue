@@ -102,15 +102,47 @@ function defaultset() {
 }
 // 新建菜单
 const menukey = ref(false)
+const addFormRef = ref(null)
 const addForm = ref({
   menuName: '',
   menutop: '',
-  menuType: '',
+  menuType: '1',
   icon: '',
-  sort: '',
-  status: '',
+  // 初始化 sort 为数字类型
+  sort: 0,
+  status: '1',
   permission: '',
 })
+const addRules = reactive({
+  menuName: [
+    { required: true, message: '请输入菜单名称', trigger: 'blur' },
+  ],
+  path: [
+    { required: true, message: '请输入路径', trigger: 'blur' },
+  ],
+  component: [
+    { required: true, message: '请输入组件', trigger: 'blur' },
+  ],
+  sort: [
+    { required: true, message: '请输入排序', trigger: 'blur' },
+    // 如果允许排序值为 0
+    { type: 'number', min: 1, message: '排序必须大于0' },
+  ],
+})
+async function submitMenuForm(formEl) {
+  // eslint-disable-next-line style/max-statements-per-line
+  if (!formEl) { return }
+
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      console.log(formEl.model)
+    }
+    else {
+      console.log(fields)
+    }
+  })
+}
+// icon选择
 </script>
 
 <template>
@@ -183,66 +215,87 @@ const addForm = ref({
       </DataTable>
     </FaPageMain>
     <ElDialog v-model="menukey" title="添加菜单" width="800">
-      <ElForm :model="addForm" size="default" label-width="120px">
+      <ElForm ref="addFormRef" :model="addForm" size="default" label-width="120px" :rules="addRules">
         <ElRow>
           <ElCol :span="12">
-            <ElFormItem label="菜单名称">
+            <ElFormItem label="菜单名称" prop="menuName">
               <ElInput v-model="addForm.menuName" placeholder="请输入" clearable />
             </ElFormItem>
           </ElCol>
-          <ElCol :span="12">
-            <ElFormItem label="菜单图表">
-              <ElInput v-model="addForm.icon" placeholder="请输入" clearable />
+          <ElCol v-if="addForm.menuType !== '3'" :span="12">
+            <ElFormItem label="图标" prop="icon">
+              <ElPopover placement="bottom" trigger="click" popper-style="width: auto">
+                <template #reference>
+                  <ElInput v-model="addForm.icon" placeholder="请输入" clearable />
+                </template>
+                <div>
+                  <IconChoose v-model:icons="addForm.icon" />
+                </div>
+              </ElPopover>
             </ElFormItem>
           </ElCol>
           <ElRow>
-            <ElFormItem label="显示排序">
-              <ElInputNumber v-model="addForm.sort" :min="0" class="m-r[10px]" />
+            <ElFormItem label="显示排序" prop="sort">
+              <!-- 确保 v-model 绑定的值是数字类型 -->
+              <ElInputNumber v-model.number="addForm.sort" :min="0" class="m-r[10px]" />
             </ElFormItem>
           </ElRow>
         </ElRow>
         <ElRow>
-          <ElFormItem label="菜单类型">
+          <ElFormItem label="菜单类型" prop="menuType">
             <ElRadioGroup v-model="addForm.menuType">
-              <ElRadio label="1">
+              <ElRadio value="1">
                 目录
               </ElRadio>
-              <ElRadio label="2">
+              <ElRadio value="2">
                 菜单
               </ElRadio>
-              <ElRadio label="3">
+              <ElRadio value="3">
                 按钮
               </ElRadio>
             </ElRadioGroup>
           </ElFormItem>
         </ElRow>
         <ElRow>
-          <ElCol :span="12">
-            <ElFormItem label="菜单路径">
+          <ElCol v-if="addForm.menuType !== '3'" :span="12">
+            <ElFormItem label="菜单路径" prop="path">
               <ElInput v-model="addForm.path" placeholder="请输入" clearable />
             </ElFormItem>
           </ElCol>
-          <ElCol :span="12">
-            <ElFormItem label="组件路径">
+          <ElCol v-if="addForm.menuType === '2'" :span="12">
+            <ElFormItem label="组件路径" prop="component">
               <ElInput v-model="addForm.component" placeholder="请输入" clearable />
             </ElFormItem>
           </ElCol>
           <ElCol :span="12">
-            <ElFormItem label="权限标识">
+            <ElFormItem label="权限标识" prop="permission">
               <ElInput v-model="addForm.permission" placeholder="请输入" clearable />
             </ElFormItem>
           </ElCol>
         </ElRow>
         <ElRow>
-          <ElFormItem label="菜单状态">
+          <ElFormItem label="菜单状态" prop="status">
             <ElRadioGroup v-model="addForm.status">
-              <ElRadio label="0">
+              <ElRadio value="1">
                 显示
               </ElRadio>
-              <ElRadio label="1">
+              <ElRadio value="0">
                 隐藏
               </ElRadio>
             </ElRadioGroup>
+          </ElFormItem>
+        </ElRow>
+        <ElRow>
+          <ElFormItem>
+            <ElButton type="primary" @click="submitMenuForm(addFormRef)">
+              <template #icon>
+                <FaIcon name="i-ep:plus" />
+              </template>
+              提交
+            </ElButton>
+            <ElButton @click="menukey = false">
+              取消
+            </ElButton>
           </ElFormItem>
         </ElRow>
       </ElForm>

@@ -11,68 +11,51 @@ export default defineFakeRoute([
         data: [
           {
             meta: {
-              title: '演示',
+              title: '主应用',
               icon: 'uim:box',
             },
             children: [
               {
-                path: '/multilevel_menu_example',
+                path: '/system',
                 component: 'Layout',
-                name: 'multilevelMenuExample',
+                name: 'system',
                 meta: {
-                  title: '多级导航',
+                  title: '系统管理',
                   icon: 'heroicons-solid:menu-alt-3',
                 },
                 children: [
                   {
-                    path: 'page',
-                    name: 'multilevelMenuExample1',
-                    component: 'multilevel_menu_example/page.vue',
+                    path: 'dept',
+                    name: 'dept',
+                    component: 'system/dept.vue',
                     meta: {
-                      title: '导航1',
+                      title: '部门管理',
                     },
                   },
                   {
-                    path: 'level2',
-                    name: 'multilevelMenuExample2',
+                    path: 'menu',
+                    name: 'menu',
+                    component: 'system/menu.vue',
                     meta: {
-                      title: '导航2',
+                      title: '菜单管理',
                     },
-                    children: [
-                      {
-                        path: 'page',
-                        name: 'multilevelMenuExample2-1',
-                        component: 'multilevel_menu_example/level2/page.vue',
-                        meta: {
-                          title: '导航2-1',
-                        },
-                      },
-                      {
-                        path: 'level3',
-                        name: 'multilevelMenuExample2-2',
-                        meta: {
-                          title: '导航2-2',
-                        },
-                        children: [
-                          {
-                            path: 'page1',
-                            name: 'multilevelMenuExample2-2-1',
-                            component: 'multilevel_menu_example/level2/level3/page1.vue',
-                            meta: {
-                              title: '导航2-2-1',
-                            },
-                          },
-                          {
-                            path: 'page2',
-                            name: 'multilevelMenuExample2-2-2',
-                            component: 'multilevel_menu_example/level2/level3/page2.vue',
-                            meta: {
-                              title: '导航2-2-2',
-                            },
-                          },
-                        ],
-                      },
-                    ],
+                  },
+                  {
+                    path: 'role',
+                    name: 'role',
+                    component: 'system/role.vue',
+                    meta: {
+                      title: '角色管理',
+                      icon: 'i-ep:edit',
+                    },
+                  },
+                  {
+                    path: 'user',
+                    name: 'user',
+                    component: 'system/user.vue',
+                    meta: {
+                      title: '用户管理',
+                    },
                   },
                 ],
               },

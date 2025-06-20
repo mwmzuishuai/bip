@@ -6,6 +6,7 @@ import { merge } from '@/utils/object'
 const globalSettings: Settings.all = {
   app: {
     enablePermission: true,
+    routeBaseOn: 'backend'
   },
   menu: {
     enableSubMenuCollapseButton: true,

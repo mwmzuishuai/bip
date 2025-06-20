@@ -17,6 +17,7 @@ function setupRoutes(router: Router) {
     // 是否已登录
     if (userStore.isLogin) {
       // 是否已根据权限动态生成并注册路由
+
       if (routeStore.isGenerate) {
         // 导航栏如果不是 single 模式，则需要根据 path 定位主导航的选中状态
         settingsStore.settings.menu.mode !== 'single' && menuStore.setActived(to.path)
@@ -72,12 +73,14 @@ function setupRoutes(router: Router) {
           }
           // 注册并记录路由数据
           // 记录的数据会在登出时会使用到，不使用 router.removeRoute 是考虑配置的路由可能不一定有设置 name ，则通过调用 router.addRoute() 返回的回调进行删除
+
           const removeRoutes: (() => void)[] = []
           routeStore.routes.forEach((route) => {
             if (!/^(?:https?:|mailto:|tel:)/.test(route.path)) {
               removeRoutes.push(router.addRoute(route as RouteRecordRaw))
             }
           })
+
           if (settingsStore.settings.app.routeBaseOn !== 'filesystem') {
             routeStore.systemRoutes.forEach((route) => {
               removeRoutes.push(router.addRoute(route as RouteRecordRaw))

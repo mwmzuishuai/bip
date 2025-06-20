@@ -41,6 +41,7 @@ const useUserStore = defineStore(
       // 此处仅清除计算属性 isLogin 中判断登录状态过期的变量，以保证在弹出登录窗口模式下页面展示依旧正常
       localStorage.removeItem('token')
       token.value = ''
+
       router.push({
         name: 'login',
         query: {
@@ -53,6 +54,7 @@ const useUserStore = defineStore(
       // 此处仅清除计算属性 isLogin 中判断登录状态过期的变量，以保证在弹出登录窗口模式下页面展示依旧正常
       localStorage.removeItem('token')
       token.value = ''
+
       router.push({
         name: 'login',
         query: {
