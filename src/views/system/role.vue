@@ -49,8 +49,8 @@ const search = ref({
   check2: false,
 })
 const pagination = ref({
-  page: 1,
   pageSizes: [10, 20, 30, 40],
+  total: 0,
 })
 function handleSelectionChange(val) {
   console.log(val)
@@ -118,13 +118,17 @@ function handleDelete(row) {
     </FaPageMain>
     <!-- 表格 -->
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
-      <DataTable :columns="columns" :data-list="dataList" :operate="true" :pagination="pagination" @edit="handleEdit"
-        @delete="handleDelete" @current-change="handleSelectionChange" @size-change="handleSizeChange">
+      <DataTable
+        :columns="columns" :data-list="dataList" :operate="true" :pagination="pagination" @edit="handleEdit"
+        @delete="handleDelete" @current-change="handleSelectionChange" @size-change="handleSizeChange"
+      >
         <template #status="{ date }">
           <!-- {{ date }} -->
-          <ElSwitch v-model="date.status" inline-prompt active-text="已启动" inactive-text="已禁止" size="large" style="
+          <ElSwitch
+            v-model="date.status" inline-prompt active-text="已启动" inactive-text="已禁止" size="large" style="
 
-  --el-switch-on-color: #1b9cfc; --el-switch-off-color: #ff4949;" />
+  --el-switch-on-color: #1b9cfc; --el-switch-off-color: #ff4949;"
+          />
         </template>
       </DataTable>
     </FaPageMain>

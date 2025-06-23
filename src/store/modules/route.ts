@@ -120,9 +120,8 @@ const useRouteStore = defineStore(
     // 生成路由（后端获取）
     async function generateRoutesAtBack() {
       await apiApp.routeList().then((res) => {
-
         // 设置 routes 数据
-        routesRaw.value = formatBackRoutes(res.data) as any
+        routesRaw.value = formatBackRoutes(res.data.menu_tree) as any
 
         // 创建路由匹配器
         const routes: RouteRecordRaw[] = []

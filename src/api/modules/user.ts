@@ -2,7 +2,7 @@ import api from '../index'
 
 export default {
   // 登录
-  login: (data:any) => api.post('/auth/login', data, ),
+  login: (data: any) => api.post('/auth/login', data),
 
   // 获取权限
   permission: () => api.get('user/permission', {
@@ -10,6 +10,7 @@ export default {
   }),
   // 验证码
   getCaptcha: () => api.get('/auth/captcha'),
+  getUserList: (data: any) => api.get('/sys/user/list', { params: data }),
   // 修改密码
   passwordEdit: (data: {
     password: string

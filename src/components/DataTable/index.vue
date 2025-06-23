@@ -50,7 +50,7 @@ watch(() => props.defaultExpandAll, () => {
   <div class="flex justify-end">
     <ElPagination
       v-if="props.pagination" background :page-sizes="props.pagination.pageSizes"
-      layout="total, sizes, prev, pager, next, jumper" :total="props.dataList.length"
+      layout="total, sizes, prev, pager, next, jumper" :total="props.pagination.total"
       :disabled="props.pagination.disabled || false" class="m-t[16px]" @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />

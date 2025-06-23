@@ -1,11 +1,18 @@
 <script setup>
 import { ref } from 'vue'
+import api from '@/api/modules/user'
 
 const formUser = ref({
-  name: '',
-  mobile: '',
-  status: '',
-  date: '',
+  // name: '',
+  // mobile: '',
+  // status: '',
+  // date: '',
+  page: 1,
+  size: 10,
+})
+const pagination = ref({
+  pageSizes: [10, 20, 30, 40],
+  total: 0,
 })
 const data = ref([
   {
@@ -65,40 +72,49 @@ const data = ref([
   },
 ])
 const columns = ref([{
-  type: 'selection',
-  width: '50',
-  align: 'center',
-}, {
-  type: 'index',
-  label: '用户编号',
-  width: '100',
-  align: 'center',
-}, {
-  props: 'username',
+  prop: 'username',
   label: '用户名称',
   width: '260',
   align: 'center',
 }, {
-  props: 'mobile',
+  prop: 'mobile',
   label: '手机号',
   width: '250',
   align: 'center',
 }, {
-  props: 'deptName',
+  prop: 'deptName',
   label: '部门',
   width: '200',
   align: 'center',
 }, {
-  props: 'status',
+  prop: 'status',
   label: '状态',
   width: '150',
   align: 'center',
   render: true,
 }, {
-  props: 'createTime',
+  prop: 'createTime',
   label: '创建时间',
   align: 'center',
 }])
+const dataList = ref([
+])
+function getUserList() {
+  api.getUserList(formUser.value).then((res) => {
+    dataList.value = res.items
+    pagination.value.total = res.total
+  })
+}
+function handleCurrentChange(val) {
+  formUser.value.page = val
+  getUserList()
+}
+function dalete(val) {
+  console.log(val)
+}
+onMounted(() => {
+  getUserList()
+})
 </script>
 
 <template>
@@ -179,7 +195,20 @@ const columns = ref([{
           </ElButton>
         </div>
         <div class="flex-1 overflow-auto" main-class="flex-1 flex  overflow-auto">
-          <DataTable :columns="columns" :operate="true" />
+          <DataTable
+            :columns="columns" :data-list="dataList" :operate="true" :pagination="pagination"
+            @edit="handleEdit" @delete="dalete" @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+          >
+            <template #status="{ date }">
+              <!-- {{ date }} -->
+              <ElSwitch
+                v-model="date.status" inline-prompt active-text="已启动" inactive-text="已禁止" size="large" style="
+
+  --el-switch-on-color: #1b9cfc; --el-switch-off-color: #ff4949;"
+              />
+            </template>
+          </DataTable>
         </div>
       </FaPageMain>
     </FaPageMain>

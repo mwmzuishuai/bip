@@ -10,58 +10,135 @@ export default defineFakeRoute([
         status: 1,
         data: [
           {
+            id: 1,
+            name: 'main',
+            path: 'main',
+            parent_id: null,
+            sort: 0,
+            type: 0,
+            component: null,
+            perms: null,
+            is_active: true,
+            remark: null,
+            create_time: '2025-06-09 17:26:18',
+            update_time: null,
             meta: {
               title: '主应用',
               icon: 'uim:box',
+              link: null,
+              cache: true,
+              display: true,
             },
             children: [
               {
-                path: '/system',
+                // id: 2,
+                // name: 'Dashboard',
+                path: '/dashboard',
+                // parent_id: 1,
+                // sort: 1,
+                // type: 1,
                 component: 'Layout',
-                name: 'system',
+                // perms: null,
+                // is_active: true,
+                // remark: null,
+                // create_time: '2025-06-09 17:26:18',
+                // update_time: null,
                 meta: {
-                  title: '系统管理',
-                  icon: 'heroicons-solid:menu-alt-3',
+                  title: '概览',
+                  // icon: null,
+                  // link: null,
+                  // cache: true,
+                  // display: true,
                 },
-                children: [
-                  {
-                    path: 'dept',
-                    name: 'dept',
-                    component: 'system/dept.vue',
-                    meta: {
-                      title: '部门管理',
-                    },
-                  },
-                  {
-                    path: 'menu',
-                    name: 'menu',
-                    component: 'system/menu.vue',
-                    meta: {
-                      title: '菜单管理',
-                    },
-                  },
-                  {
-                    path: 'role',
-                    name: 'role',
-                    component: 'system/role.vue',
-                    meta: {
-                      title: '角色管理',
-                      icon: 'i-ep:edit',
-                    },
-                  },
-                  {
-                    path: 'user',
-                    name: 'user',
-                    component: 'system/user.vue',
-                    meta: {
-                      title: '用户管理',
-                    },
-                  },
-                ],
+                // children: [
+
+                // ],
               },
             ],
+            // children: [
+            //   {
+            //     id: 2,
+            //     name: 'Dashboard',
+            //     path: 'dashboard',
+            //     parent_id: 1,
+            //     sort: 1,
+            //     type: 1,
+            //     component: null,
+            //     perms: null,
+            //     is_active: true,
+            //     remark: null,
+            //     create_time: '2025-06-09 17:26:18',
+            //     update_time: null,
+            //     meta: {
+            //       title: '概览',
+            //       icon: null,
+            //       link: null,
+            //       cache: true,
+            //       display: true,
+            //     },
+            //     children: [
+
+            //     ],
+            //   },
+
+            // ],
           },
         ],
+        // data: [
+        //   {
+        //     path: 'main',
+        //     meta: {
+        //       title: '主应用',
+        //       icon: 'uim:box',
+        //     },
+        //     children: [
+        //       {
+        //         path: '/system',
+        //         component: 'Layout',
+        //         name: 'system',
+        //         meta: {
+        //           title: '系统管理',
+        //           icon: 'heroicons-solid:menu-alt-3',
+        //         },
+        //         children: [
+        //           {
+        //             path: 'dept',
+        //             name: 'dept',
+        //             component: 'system/dept.vue',
+        //             meta: {
+        //               title: '部门管理',
+        //             },
+        //           },
+        //           {
+        //             path: 'menu',
+        //             name: 'menu',
+        //             component: 'system/menu.vue',
+        //             meta: {
+        //               title: '菜单管理',
+        //             },
+        //           },
+        //           {
+        //             path: 'role',
+        //             name: 'role',
+        //             component: 'system/role.vue',
+        //             meta: {
+        //               title: '角色管理',
+        //               icon: 'ri:admin-fill',
+        //             },
+        //           },
+        //           {
+        //             path: 'user',
+        //             name: 'user',
+        //             component: 'system/user.vue',
+        //             meta: {
+        //               title: '用户管理',
+        //             },
+        //           },
+        //         ],
+        //       },
+        //     ],
+        //   },
+        // ],
       }
     },
   },
