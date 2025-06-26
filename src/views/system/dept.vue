@@ -1,4 +1,8 @@
 <script setup>
+import useStystemStore from '@/store/modules/system'
+
+const stystemStore = useStystemStore()
+const { depts } = storeToRefs(stystemStore)
 const deptForm = ref({
   deptName: '',
   status: '',
@@ -33,7 +37,7 @@ const dataList = ref([
 ])
 const columns = ref([
   {
-    prop: 'deptName',
+    prop: 'name',
     label: '部门名称',
     width: '400',
     align: 'center',
@@ -45,14 +49,14 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop: 'status',
+    prop: 'is_active',
     label: '状态',
     width: '200',
     align: 'center',
     render: true,
   },
   {
-    prop: 'createTime',
+    prop: 'create_time',
     label: '创建时间',
     align: 'center',
   },
@@ -117,7 +121,7 @@ const deptkey = ref(false)
         </ElButton>
       </div>
       <DataTable
-        row-key="id" :data-list="dataList" :columns="columns" :operate="true"
+        row-key="id" :data-list="depts" :columns="columns" :operate="true"
         :default-expand-all="defaultExpandAll"
       >
         <template #status="{ date }">

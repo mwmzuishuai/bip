@@ -26,14 +26,14 @@ const useUserStore = defineStore(
     })
 
     // 登录
-    async function login(data:any) {
+    async function login(data: any) {
       const res = await apiUser.login(data)
       localStorage.setItem('account', res.data.username)
       localStorage.setItem('token', res.data.access_token)
       localStorage.setItem('avatar', res.data.avatar)
-      account.value = res.data.username||'小小'
+      account.value = res.data.username || '小小'
       token.value = res.data.access_token
-      avatar.value = res.data.avatar||''
+      avatar.value = res.data.avatar || ''
     }
 
     // 手动登出
@@ -84,7 +84,8 @@ const useUserStore = defineStore(
     // 获取权限
     async function getPermissions() {
       const res = await apiUser.permission()
-      permissions.value = res.data.permissions
+
+      permissions.value = res.permissions
     }
     // 修改密码
     async function editPassword(data: {

@@ -10,7 +10,7 @@ const routes: RouteRecordRaw = {
   name: 'system',
   meta: {
     title: '系统管理',
-    icon: 'i-heroicons-solid:menu-alt-3',
+    icon: 'icon-park-twotone:system',
   },
   children: [
     {
@@ -19,6 +19,7 @@ const routes: RouteRecordRaw = {
       component: () => import('@/views/system/role.vue'),
       meta: {
         title: '角色管理',
+        icon: 'tdesign:accessibility',
       },
     },
     {
@@ -27,6 +28,7 @@ const routes: RouteRecordRaw = {
       component: () => import('@/views/system/menu.vue'),
       meta: {
         title: '菜单管理',
+        icon: 'material-symbols:format-list-bulleted',
       },
     },
     {
@@ -35,6 +37,7 @@ const routes: RouteRecordRaw = {
       component: () => import('@/views/system/dept.vue'),
       meta: {
         title: '部门管理',
+        icon: 'prime:flag',
       },
     },
     {
@@ -43,6 +46,7 @@ const routes: RouteRecordRaw = {
       component: () => import('@/views/system/user.vue'),
       meta: {
         title: '用户管理',
+        icon: 'material-symbols:manage-accounts-outline-rounded',
       },
     },
   ],

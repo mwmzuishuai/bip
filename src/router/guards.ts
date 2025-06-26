@@ -4,6 +4,7 @@ import useKeepAliveStore from '@/store/modules/keepAlive'
 import useMenuStore from '@/store/modules/menu'
 import useRouteStore from '@/store/modules/route'
 import useSettingsStore from '@/store/modules/settings'
+import useStystemStore from '@/store/modules/system'
 import useUserStore from '@/store/modules/user'
 import { asyncRoutes, asyncRoutesByFilesystem } from './routes'
 import '@/assets/styles/nprogress.css'
@@ -12,6 +13,7 @@ function setupRoutes(router: Router) {
   router.beforeEach(async (to, _from, next) => {
     const settingsStore = useSettingsStore()
     const userStore = useUserStore()
+    const systemStore = useStystemStore()
     const routeStore = useRouteStore()
     const menuStore = useMenuStore()
     // 是否已登录
@@ -50,6 +52,7 @@ function setupRoutes(router: Router) {
         try {
           // 获取用户权限
           settingsStore.settings.app.enablePermission && await userStore.getPermissions()
+          await systemStore.getDepts()
           // 生成动态路由
           switch (settingsStore.settings.app.routeBaseOn) {
             case 'frontend':
@@ -170,11 +173,18 @@ function setupTitle(router: Router) {
 function setupKeepAlive(router: Router) {
   router.afterEach((to, from) => {
     const keepAliveStore = useKeepAliveStore()
+
     // 判断当前页面是否开启缓存，如果开启，则将当前页面的 name 信息存入 keep-alive 全局状态
     if (to.meta.cache) {
-      const componentName = to.matched.at(-1)?.components?.default.name
+      const componentName = to.name
       if (componentName) {
-        keepAliveStore.add(componentName)
+        // 由于 componentName 可能是 symbol 类型，而 keepAliveStore.add 方法需要 string 或 string[] 类型，因此将其转换为字符串
+        if (typeof componentName === 'symbol') {
+          keepAliveStore.add(componentName.toString())
+        }
+        else {
+          keepAliveStore.add(componentName)
+        }
       }
       else {
         // turbo-console-disable-next-line

@@ -183,7 +183,7 @@ async function submitMenuForm(formEl) {
 
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
       <div class="m-b-4 flex">
-        <ElButton type="primary" @click="menukey = true">
+        <ElButton v-auth="['system:user:edit']" type="primary" @click="menukey = true">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>

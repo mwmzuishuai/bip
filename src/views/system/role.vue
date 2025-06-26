@@ -1,6 +1,16 @@
-<script setup>
-import { ref } from 'vue'
+<route lang="yaml">
+meta:
+  title: 角色管理
+</route>
 
+<script setup name>
+import { ref } from 'vue'
+import useStystemStore from '@/store/modules/system'
+
+const stystemStore = useStystemStore()
+const { depts, deptsTree } = storeToRefs(stystemStore)
+const treeRef = ref(null)
+const roleDrawerKey = ref(false)
 const columns = ref([
   {
     type: 'selection',
@@ -60,9 +70,15 @@ function handleSizeChange(val) {
 }
 function handleEdit(row) {
   console.log(row)
+  roleDrawerKey.value = true
 }
 function handleDelete(row) {
   console.log(row)
+}
+function getCurrent() {
+  if (treeRef.value) {
+    console.log([...treeRef.value.getHalfCheckedKeys(), ...treeRef.value.getCheckedKeys()])
+  }
 }
 </script>
 
@@ -132,6 +148,12 @@ function handleDelete(row) {
         </template>
       </DataTable>
     </FaPageMain>
+    <ElDrawer v-model="roleDrawerKey" title="角色编辑">
+      <ElTree ref="treeRef" show-checkbox :data="deptsTree" node-key="id" />
+      <ElButton type="primary" @click="getCurrent">
+        保存
+      </ElButton>
+    </ElDrawer>
   </div>
 </template>
 

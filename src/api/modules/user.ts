@@ -5,12 +5,13 @@ export default {
   login: (data: any) => api.post('/auth/login', data),
 
   // 获取权限
-  permission: () => api.get('user/permission', {
-    baseURL: '/mock/',
-  }),
+  permission: () => api.get('/sys/users/permissions'),
+  // permission: () => api.get('user/permission', {
+  //   baseURL: '/mock/',
+  // }),
   // 验证码
   getCaptcha: () => api.get('/auth/captcha'),
-  getUserList: (data: any) => api.get('/sys/user/list', { params: data }),
+
   // 修改密码
   passwordEdit: (data: {
     password: string
