@@ -10,7 +10,8 @@ const routes: RouteRecordRaw = {
   name: 'system',
   meta: {
     title: '系统管理',
-    icon: 'icon-park-twotone:system',
+    icon: 'i-ant-design:AppstoreOutlined',
+    auth: ['sys'],
   },
   children: [
     {
@@ -20,6 +21,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '角色管理',
         icon: 'tdesign:accessibility',
+        auth: ['sys:role:view'],
       },
     },
     {
@@ -29,6 +31,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '菜单管理',
         icon: 'material-symbols:format-list-bulleted',
+        auth: ['sys:menu:view'],
       },
     },
     {
@@ -38,6 +41,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '部门管理',
         icon: 'prime:flag',
+        auth: ['sys:dept:view'],
       },
     },
     {
@@ -47,6 +51,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '用户管理',
         icon: 'material-symbols:manage-accounts-outline-rounded',
+        auth: ['sys:user:view'],
       },
     },
   ],

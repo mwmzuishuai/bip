@@ -14,6 +14,9 @@ const globalSettings: Settings.all = {
   topbar: {
     mode: 'fixed',
   },
+  layout: {
+    enableMobileAdaptation: true,
+  },
   tabbar: {
     enable: true,
     enableIcon: true,

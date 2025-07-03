@@ -55,6 +55,8 @@ const onSubmit = form.handleSubmit((values) => {
     emits('onLogin', values.username)
   }).finally(() => {
     loading.value = false
+  }).catch(() => {
+    onRefreshCode()
   })
 })
 // 验证码生成
@@ -86,21 +88,27 @@ onMounted(() => {
       </p>
     </div>
     <div class="mb-4">
-      <FaTabs v-model="type" :list="[
+      <FaTabs
+        v-model="type" :list="[
           { label: '账号密码登录', value: 'default' },
         // { label: '扫码登录', value: 'qrcode' },
-        ]" class="inline-flex" />
+        ]" class="inline-flex"
+      />
     </div>
     <div v-show="type === 'default'">
       <form @submit="onSubmit">
         <FormField v-slot="{ componentField, errors }" name="username">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput type="text" placeholder="请输入用户名" class="w-full" :class="errors.length && 'border-destructive'"
-                v-bind="componentField" />
+              <FaInput
+                type="text" placeholder="请输入用户名" class="w-full" :class="errors.length && 'border-destructive'"
+                v-bind="componentField"
+              />
             </FormControl>
-            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
-              leave-active-class="transition-opacity" leave-to-class="opacity-0">
+            <Transition
+              enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0"
+            >
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -108,11 +116,15 @@ onMounted(() => {
         <FormField v-slot="{ componentField, errors }" name="password">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput type="password" placeholder="请输入密码" class="w-full" :class="errors.length && 'border-destructive'"
-                v-bind="componentField" />
+              <FaInput
+                type="password" placeholder="请输入密码" class="w-full" :class="errors.length && 'border-destructive'"
+                v-bind="componentField"
+              />
             </FormControl>
-            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
-              leave-active-class="transition-opacity" leave-to-class="opacity-0">
+            <Transition
+              enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0"
+            >
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -121,14 +133,18 @@ onMounted(() => {
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
               <div class="flex-center-between">
-                <FaInput type="password" placeholder="请输入验证码" class="w-1xl"
-                  :class="errors.length && 'border-destructive'" v-bind="componentField" />
+                <FaInput
+                  type="password" placeholder="请输入验证码" class="w-1xl"
+                  :class="errors.length && 'border-destructive'" v-bind="componentField"
+                />
                 <!-- 验证图片 -->
                 <img :src="codeUrl" alt="点击刷新" title="点击刷新" class="h-[40px] w-[100px]" @click="onRefreshCode">
               </div>
             </FormControl>
-            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
-              leave-active-class="transition-opacity" leave-to-class="opacity-0">
+            <Transition
+              enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0"
+            >
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -145,8 +161,10 @@ onMounted(() => {
               </FormItem>
             </FormField>
           </div>
-          <FaButton variant="link" class="h-auto p-0" type="button"
-            @click="emits('onResetPassword', form.values.username)">
+          <FaButton
+            variant="link" class="h-auto p-0" type="button"
+            @click="emits('onResetPassword', form.values.username)"
+          >
             忘记密码了?
           </FaButton>
         </div>
@@ -154,8 +172,7 @@ onMounted(() => {
           登录
         </FaButton>
       </form>
-      <div class="mt-4 text-center -mb-4">
-      </div>
+      <div class="mt-4 text-center -mb-4" />
     </div>
     <div v-show="type === 'qrcode'">
       <div class="flex-col-center">

@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import generatedRoutes from 'virtual:generated-pages'
 import { setupLayouts } from 'virtual:meta-layouts'
 import useSettingsStore from '@/store/modules/settings'
+import Logs from './modules/log'
 import MultilevelMenuExample from './modules/system'
 
 // 固定路由（默认路由）
@@ -33,6 +34,9 @@ const systemRoutes: RouteRecordRaw[] = [
     meta: {
       title: () => useSettingsStore().settings.home.title,
       breadcrumb: false,
+      // auth: [
+      //   'main',
+      // ],
     },
     children: [
       {
@@ -66,17 +70,39 @@ const asyncRoutes: Route.recordMainRaw[] = [
     },
     children: [
       MultilevelMenuExample,
+      Logs,
     ],
   },
-  {
-    meta: {
-      title: '检测',
-      icon: 'streamline:industry-innovation-and-infrastructure',
-    },
-    children: [
-      MultilevelMenuExample,
-    ],
-  },
+  // {
+  //   meta: {
+  //     title: '检测',
+  //     icon: 'streamline:industry-innovation-and-infrastructure',
+  //   },
+  //   children: [
+  //     {
+  //       path: '/systems',
+  //       component: import('@/layouts/index.vue'),
+  //       name: 'systems',
+  //       meta: {
+  //         title: '系统管理',
+  //         icon: 'icon-park-twotone:system',
+  //       },
+  //       children: [
+  //         {
+  //           path: '',
+  //           name: 'users',
+  //           component: () => import('@/views/system/user.vue'),
+  //           meta: {
+  //             title: '用户管理',
+  //             icon: 'material-symbols:manage-accounts-outline-rounded',
+  //             menu: false,
+  //             breadcrumb: false,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
 ]
 
 const constantRoutesByFilesystem = generatedRoutes.filter((item) => {

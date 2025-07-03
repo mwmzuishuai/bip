@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
+import { number } from 'zod'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
 
@@ -13,26 +14,13 @@ const addFormRef = ref(null)
 const dtawerKey = ref(false)
 const delectList = ref([])
 const formUser = ref({
-  // 状态
-  is_active: null,
-  // 用户名称
-  username: '',
-  // 手机号
-  phone: '',
-  // 创建时间是范围选取wei'
-  create_time: '',
-  // 部门名称
-  dept: '',
   page: 1,
   size: 10,
 })
 const drwawerForm = ref({
   username: '',
   phone: '',
-  dept_id: '',
-  email: '',
-  gender: '',
-  role: '',
+  gender: null,
   is_active: '',
   nickname: '',
   password: '',
@@ -40,12 +28,50 @@ const drwawerForm = ref({
 const addRules = reactive({
   username: [
     { required: true, message: '请输入用户名称', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (value.includes(' ')) {
+          callback(new Error('用户名称不能含有空白字符'))
+        }
+        else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
   ],
   phone: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        const phoneReg = /^1[3-9]\d{9}$/
+        if (!phoneReg.test(value)) {
+          callback(new Error('请输入正确的手机号'))
+        }
+        else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
   ],
   nickname: [
     { required: true, message: '请输入昵称', trigger: 'blur' },
+    // 昵称不能含有空白字符
+    {
+      validator: (rule, value, callback) => {
+        if (value.includes(' ')) {
+          callback(new Error('昵称不能含有空白字符'))
+        }
+        else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  is_active: [
+    { required: true, message: '请选择状态', trigger: 'blur' },
   ],
   gender: [
     { required: true, message: '请选择性别', trigger: 'blur' },
@@ -73,6 +99,31 @@ const addRules = reactive({
         }
       },
       trigger: 'blur',
+    },
+    {
+      validator: (rule, value, callback) => {
+        if (value.includes(' ')) {
+          callback(new Error('密码不能含有空白字符'))
+        }
+        else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  email: [
+    {
+      validator: (rule, value, callback) => {
+        if (!value) {
+          callback()
+          return
+        }
+        const emailReg = /^[\w-]+@[\w-]+(\.[\w-]+)+$/
+        if (!emailReg.test(value)) {
+          callback(new Error('请输入正确的邮箱'))
+        }
+      },
     },
   ],
 })
@@ -150,6 +201,13 @@ function handleCurrentChange(val) {
   formUser.value.page = val
   getUserList()
 }
+// 获取角色列表
+const roleList = ref([])
+function isgetRolelist() {
+  api.getRolelist({ page: 1, size: 200 }).then((res) => {
+    roleList.value = res.data.items
+  })
+}
 async function dalete(val) {
   try {
     await ElMessageBox.confirm('是否确认删除?', '删除用户', {
@@ -187,16 +245,6 @@ function searchList() {
 // 重置
 function reset() {
   formUser.value = {
-    // 状态
-    is_active: null,
-    // 用户名称
-    username: '',
-    // 手机号
-    phone: '',
-    // 创建时间是范围选取wei'
-    create_time: [],
-    // 部门名称
-    dept: '',
     page: 1,
     size: 10,
   }
@@ -218,26 +266,45 @@ function getUserInfos(id) {
 async function putUserInfos(formEl) {
   if (!formEl) { return }
 
-  await formEl.validate((valid, fields) => {
+  await formEl.validate((valid) => {
     if (valid) {
       if (titleDrawer.value === '编辑用户') {
-        api.patchUserInfo(drwawerForm.value.id, drwawerForm.value).then((res) => {
+        api.patchUserInfo(drwawerForm.value.id, drwawerForm.value).then(() => {
           toast.success('修改成功')
           dtawerKey.value = false
           getUserList()
         })
       }
       else {
-        api.postUserInfo(drwawerForm.value).then((res) => {
+        api.postUserInfo(drwawerForm.value).then(() => {
           toast.success('新增成功')
           dtawerKey.value = false
           getUserList()
         })
       }
     }
-    else {
-      console.log(fields, 1)
-    }
+  })
+}
+function handleBeforeSwitchChange() {
+  return new Promise((resolve) => {
+    ElMessageBox.confirm('是否确定修改该状态?', '修改状态', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'error',
+    }).then(() => {
+      return resolve(true)
+    })
+  })
+}
+async function handleSwitchChange(res) {
+  const is_key = res.is_active
+
+  api.patchUserInfo(res.id, { is_active: res.is_active }).then(() => {
+    toast.success('修改成功')
+    dtawerKey.value = false
+    getUserList()
+  }).catch(() => {
+    res.is_active = !is_key
   })
 }
 // 新增用户
@@ -245,15 +312,7 @@ function postUserInfos() {
   dtawerKey.value = true
   titleDrawer.value = '新增用户'
   drwawerForm.value = {
-    username: '',
-    phone: '',
-    dept_id: '',
-    email: '',
-    gender: '',
-    role: '',
-    is_active: '',
-    nickname: '',
-    password: '',
+
   }
 }
 // 多选
@@ -264,6 +323,7 @@ function handleSelectionChange(val) {
 }
 onMounted(() => {
   getUserList()
+  isgetRolelist()
 })
 watch(() => formUser.value, () => {
   console.log(formUser.value)
@@ -277,7 +337,7 @@ watch(() => formUser.value, () => {
     <FaPageMain>
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm :model="formUser" size="default" label-width="120px">
+          <ElForm :model="formUser" size="default" label-width="120px" @keydown.enter="searchList">
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="用户名称">
@@ -302,6 +362,14 @@ watch(() => formUser.value, () => {
                   <el-date-picker
                     v-model="formUser.create_time" type="daterange" range-separator="-"
                     start-placeholder="开始日期" end-placeholder="结束日期" value-format="YYYY-MM-DD" placeholder="选择日期范围"
+                  />
+                </ElFormItem>
+              </ElCol>
+              <ElCol :span="6">
+                <ElFormItem label="部门" prop="parent_id">
+                  <ElTreeSelect
+                    v-model="formUser.parent_id" :data="menusTree" placeholder="请输入" clearable
+                    check-strictly
                   />
                 </ElFormItem>
               </ElCol>
@@ -346,9 +414,8 @@ watch(() => formUser.value, () => {
         <template #is_active="{ date }">
           <!-- {{ date }} -->
           <ElSwitch
-            v-model="date.is_active" inline-prompt active-text="已启动" inactive-text="已禁止" size="large" style="
-
-  --el-switch-on-color: #1b9cfc; --el-switch-off-color: #ff4949;"
+            v-model="date.is_active" inline-prompt active-text="已启动" inactive-text="已禁止" size="large"
+            class="switch-container" :before-change="handleBeforeSwitchChange" @change="handleSwitchChange(date)"
           />
         </template>
         <template #gender="{ date }">
@@ -400,10 +467,10 @@ watch(() => formUser.value, () => {
               <ElCol :span="12">
                 <ElFormItem label="状态" prop="is_active">
                   <ElRadioGroup v-model="drwawerForm.is_active">
-                    <ElRadio value="1">
+                    <ElRadio :value="true">
                       启用
                     </ElRadio>
-                    <ElRadio value="2">
+                    <ElRadio :value="false">
                       禁用
                     </ElRadio>
                   </ElRadioGroup>
@@ -413,9 +480,8 @@ watch(() => formUser.value, () => {
             <ElRow>
               <ElCol :span="12">
                 <ElFormItem label="角色" prop="role">
-                  <ElSelect v-model="drwawerForm.role" clearable placeholder="请选择" multiple>
-                    <ElOption label="超级管理员" :value="1" />
-                    <ElOption label="普通管理员" :value="2" />
+                  <ElSelect v-model="drwawerForm.role" clearable placeholder="请选择" multiple filterable>
+                    <ElOption v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
@@ -456,6 +522,11 @@ watch(() => formUser.value, () => {
   flex-direction: column;
   width: 100%;
   height: 100%;
+}
+
+.switch-container {
+  --el-switch-on-color: #1b9cfc;
+  --el-switch-off-color: #ff4949;
 }
 
 .trees {

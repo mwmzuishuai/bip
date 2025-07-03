@@ -4,6 +4,8 @@ const useStystemStore = defineStore('system', () => {
   const depts = ref([])
   const deptsTree = ref([])
   const deptsTreeTvalue = ref([])
+  const menus = ref([])
+  const menusTree = ref([])
   async function getDepts() {
     const res = await api.getTreeDepts()
     depts.value = res.data.dept_tree
@@ -31,11 +33,31 @@ const useStystemStore = defineStore('system', () => {
     deptsTree.value = processTree(depts.value, 1)
     deptsTreeTvalue.value = processTree(depts.value, 2)
   }
+  // 获取菜单
+  async function getMenus(data: any) {
+    const res = await api.routeList(data)
+    menus.value = res.data.menu_tree
+    function processTree(data: any[]) {
+      return data.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+          ...item,
+          children: item.children ? processTree(item.children) : [],
+        }
+      })
+    }
+    menusTree.value = processTree(menus.value)
+  }
   return {
     deptsTreeTvalue,
     depts,
     getDepts,
     deptsTree,
+    getMenus,
+    menusTree,
+    menus,
+
   }
 })
 export default useStystemStore

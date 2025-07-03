@@ -29,7 +29,7 @@ api.interceptors.request.use(
     // 设置请求头
     if (request.headers) {
       if (userStore.isLogin) {
-        request.headers.authorization ='Bearer ' +userStore.token
+        request.headers.authorization = `Bearer ${userStore.token}`
       }
     }
     // 是否将 POST 请求参数进行字符串化处理
@@ -59,7 +59,7 @@ function handleError(error: any) {
   else if (message.includes('Request failed with status code')) {
     message = error.response.data.message
   }
-  toast.error('Error', {
+  toast.error('', {
     description: message,
   })
   return Promise.reject(error)
@@ -82,9 +82,7 @@ api.interceptors.response.use(
 
     // 如果配置不存在或未启用重试，则直接处理错误
     if (!config || !config.retry) {
-
       return handleError(error)
-
     }
 
     // 设置重试次数
@@ -92,10 +90,9 @@ api.interceptors.response.use(
 
     // 判断是否超过重试次数
     if (config.retryCount >= MAX_RETRY_COUNT) {
-      console.log(2);
+      console.log(2)
 
       return handleError(error)
-
     }
 
     // 重试次数自增

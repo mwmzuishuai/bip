@@ -5,7 +5,7 @@ export default {
   login: (data: any) => api.post('/auth/login', data),
 
   // 获取权限
-  permission: () => api.get('/sys/users/permissions'),
+  permission: () => api.get('/sys/permissions'),
   // permission: () => api.get('user/permission', {
   //   baseURL: '/mock/',
   // }),

@@ -5,6 +5,7 @@
 const props = defineProps(['columns', 'dataList', 'operate', 'pagination', 'rowKey', 'defaultExpandAll', 'loading'])
 const emit = defineEmits(['edit', 'delete', 'currentChange', 'sizeChange', 'selectionChange'])
 const key = ref(new Date().getTime())
+const multipleTableRef = ref(null)
 function handleSizeChange(val) {
   emit('sizeChange', val)
 }
@@ -17,12 +18,14 @@ function handleSelectionChange(val) {
 watch(() => props.defaultExpandAll, () => {
   key.value = new Date().getTime()
 })
+defineExpose({ multipleTableRef })
 </script>
 
 <template>
   <ElTable
-    :key="key" v-loading="props.loading" :data="props.dataList" stripe highlight-current-row border
-    height="100%" :row-key="props.rowKey" :default-expand-all="props.defaultExpandAll" @selection-change="handleSelectionChange"
+    :key="key" ref="multipleTableRef" v-loading="props.loading" :data="props.dataList" stripe highlight-current-row border
+    height="100%" :row-key="props.rowKey" :default-expand-all="props.defaultExpandAll"
+    @selection-change="handleSelectionChange"
   >
     <ElTableColumn
       v-for="(item, index) in props.columns" :key="index" :type="item.type" :prop="item.prop"
@@ -34,12 +37,12 @@ watch(() => props.defaultExpandAll, () => {
     </ElTableColumn>
     <ElTableColumn v-if="props.operate" label="操作" fixed="right" width="120" align="center">
       <template #default="scope">
-        <ElButton type="primary" circle @click="emit('edit', scope.row)">
+        <ElButton type="primary" circle :disabled="props.operate.edit" @click="emit('edit', scope.row)">
           <template #icon>
             <FaIcon name="i-ep:edit" />
           </template>
         </ElButton>
-        <ElButton type="danger" circle @click="emit('delete', scope.row)">
+        <ElButton type="danger" circle :disabled="props.operate.delete" @click="emit('delete', scope.row)">
           <template #icon>
             <FaIcon name="i-ep:delete" />
           </template>
