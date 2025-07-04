@@ -24,6 +24,15 @@ const routes: RouteRecordRaw = {
         // auth: ['sys:role:view'],
       },
     },
+    {
+      path:'loginlog',
+      name:'loginlog',
+      component:()=>import('@/views/log/login.vue'),
+      meta:{
+        title:'登录日志',
+        icon:'i-ant-design:FileSearchOutlined '
+      }
+    }
   ],
 }
 

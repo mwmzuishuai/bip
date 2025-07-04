@@ -12,7 +12,15 @@ export default {
   // 删除用户
   deleteUser: (id: string) => api.delete(`/sys/users/${id}`),
   // 获取所有部门树架构
-  getTreeDepts: () => api.get('/sys/depts'),
+  getTreeDepts: () => api.get('/sys/depts/tree'),
+  //获取部门列表
+  getDeptList:()=>api.get('/sys/depts'),
+  //添加部门
+  addDept:(data:any)=>api.post('/sys/depts',{...data}),
+  //删除部门
+  deleteDept:(id:string)=>api.delete(`/sys/depts/${id}`),
+  //修改部门
+  patchDept:(id:string,data:any)=>api.patch(`/sys/depts/${id}`,data),
   // 获取所有菜单树结构
   routeList: (data: any) => api.get('/sys/menus/tree', { params: { ...data } }),
   // 新增菜单

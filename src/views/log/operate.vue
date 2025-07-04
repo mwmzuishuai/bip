@@ -4,6 +4,12 @@ const formOperate = ref({
   page: 1,
   size: 10,
 })
+const dataList = ref([])
+const loading = ref(false)
+const pagination = ref({
+  pageSizes: [10, 20, 30, 40],
+  total: 0,
+})
 const columns = ref([
   {
     prop: 'username',
@@ -78,12 +84,30 @@ const columns = ref([
     align: 'center',
   },
 ])
+
 function handleCurrentChange(val) {
   formOperate.value.page = val
 }
 function handleSizeChange(val) {
   formOperate.value.size = val
 }
+//获取操作日志列表
+function getOperateList (){
+  api.getOperateList(formOperate.value).then(res => {
+    dataList.value = res.data
+  })
+}
+//重置
+function resetForm (){
+  formOperate.value = {
+    page: 1,
+    size: 10,
+  }
+  getOperateList()
+}
+onMounted(() => {
+  // getOperateList()
+});
 </script>
 
 <template>
@@ -91,7 +115,7 @@ function handleSizeChange(val) {
     <FaPageMain>
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm :model="formOperate" size="default" label-width="120px">
+          <ElForm :model="formOperate" size="default" label-width="120px" @keyup.enter="getOperateList">
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="用户名称">
@@ -120,13 +144,13 @@ function handleSizeChange(val) {
             </ElRow>
             <ElRow>
               <ElFormItem>
-                <ElButton type="primary">
+                <ElButton type="primary" @click="getOperateList">
                   <template #icon>
                     <FaIcon name="i-ep:search" />
                   </template>
                   搜索
                 </ElButton>
-                <ElButton>
+                <ElButton @click="resetForm">
                   重置
                 </ElButton>
               </ElFormItem>

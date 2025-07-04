@@ -13,6 +13,7 @@ const titleDrawer = ref('新增用户')
 const addFormRef = ref(null)
 const dtawerKey = ref(false)
 const delectList = ref([])
+const deptList = ref([])
 const formUser = ref({
   page: 1,
   size: 10,
@@ -119,7 +120,7 @@ const addRules = reactive({
           callback()
           return
         }
-        const emailReg = /^[\w-]+@[\w-]+(\.[\w-]+)+$/
+        const emailReg = /^[\w-]+@[\w-]+(?:\.[\w-]+)+$/
         if (!emailReg.test(value)) {
           callback(new Error('请输入正确的邮箱'))
         }
@@ -131,7 +132,6 @@ const loading = ref(false)
 const pagination = ref({
   pageSizes: [10, 20, 30, 40],
   total: 0,
-  loading: false,
 })
 const columns = ref([
   {
@@ -165,10 +165,11 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop: 'dept',
+    prop: 'dept_id',
     label: '部门',
     width: '200',
     align: 'center',
+    render:true,
   },
   {
     prop: 'is_active',
@@ -206,6 +207,9 @@ const roleList = ref([])
 function isgetRolelist() {
   api.getRolelist({ page: 1, size: 200 }).then((res) => {
     roleList.value = res.data.items
+  })
+  api.getDeptList().then((res) => {
+    deptList.value = res.data.items
   })
 }
 async function dalete(val) {
@@ -326,7 +330,7 @@ onMounted(() => {
   isgetRolelist()
 })
 watch(() => formUser.value, () => {
-  console.log(formUser.value)
+
 }, {
   deep: true,
 })
@@ -368,7 +372,7 @@ watch(() => formUser.value, () => {
               <ElCol :span="6">
                 <ElFormItem label="部门" prop="parent_id">
                   <ElTreeSelect
-                    v-model="formUser.parent_id" :data="menusTree" placeholder="请输入" clearable
+                    v-model="formUser.dept_id" :data="deptsTreeTvalue" placeholder="请输入" clearable
                     check-strictly
                   />
                 </ElFormItem>
@@ -421,6 +425,9 @@ watch(() => formUser.value, () => {
         <template #gender="{ date }">
           {{ date.gender === 1 ? '男' : '女' }}
         </template>
+        <template #dept_id="{ date }">
+          {{ deptList.value?.find((item) => item.id === date.dept_id)?.name }}
+        </template>
       </DataTable>
     </FaPageMain>
     <ElDrawer v-model="dtawerKey" :title="titleDrawer" size="40%">
@@ -435,7 +442,7 @@ watch(() => formUser.value, () => {
               </ElCol>
               <ElCol :span="12">
                 <ElFormItem label="归属部门" prop="dept_id">
-                  <ElTreeSelect v-model="drwawerForm.dept_id" placeholder="请选择" :data="deptsTreeTvalue" />
+                  <ElTreeSelect v-model="drwawerForm.dept_id" placeholder="请选择" :data="deptsTreeTvalue" clearable check-strictly />
                 </ElFormItem>
               </ElCol>
             </ElRow>
