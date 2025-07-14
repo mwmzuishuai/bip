@@ -251,6 +251,7 @@ function xuan() {
 async function xuan2() {
   if (checkedCities1.value.length > 0) {
     cities.value.push(...checkedCities1.value)
+    checkedCities1.value = []
     cities1.value = cities1.value.filter((i) => {
       return !cities.value.find(item => item.id === i.id)
     })
@@ -385,8 +386,9 @@ async function generateData() {
         <ElRow>
           <ElCol :span="24">
             <ElFormItem label="接口选择" prop="api">
-              <div class="align-center w-full flex justify-between">
+              <div class="w-full flex justify-between" style="align-items: center">
                 <div class="left">
+                  <header>接口选择</header>
                   <el-checkbox
                     v-model="checkAll"
                     :indeterminate="isIndeterminate"
@@ -403,13 +405,14 @@ async function generateData() {
                     </el-checkbox>
                   </el-checkbox-group>
                 </div>
-                <div>
+                <div style="height:10px">
                   <el-button-group>
                     <el-button :icon="ArrowLeft" type="primary" @click="xuan2" />
                     <el-button :icon="ArrowRight" type="primary" @click="xuan" />
                   </el-button-group>
                 </div>
                 <div class="right">
+                  <header>已选接口</header>
                   <el-checkbox
                     v-model="checkAll1"
                     :indeterminate="isIndeterminate1"
@@ -484,18 +487,23 @@ async function generateData() {
   border: 1px solid #ccc;
   box-sizing: border-box;
   padding: 10px;
+  border-radius: 10px;
   width: 30%;
   height: 400px;
   overflow: auto;
+  background-color: #ecf0f1;
+  box-shadow: 0px 0px 5px 1px #999;
 }
 
 .right {
   border: 1px solid #ccc;
   box-sizing: border-box;
   padding: 10px;
+  border-radius: 10px;
   width: 30%;
   height: 400px;
   overflow: auto;
-
+  background-color: #ecf0f1;
+  box-shadow: 0px 0px 5px 1px #999;
 }
 </style>
