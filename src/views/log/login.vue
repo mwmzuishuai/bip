@@ -1,6 +1,7 @@
 <script setup></script>
+
 <template>
-  <div class="absolute-container"></div>
+  <div class="absolute-container" />
 </template>
 
 <style lang="scss" scoped>

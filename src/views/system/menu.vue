@@ -1,4 +1,8 @@
 <script setup>
+import {
+  ArrowLeft,
+  ArrowRight,
+} from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
 import { toast } from 'vue-sonner'
 import api from '@/api/modules/system'
@@ -9,6 +13,19 @@ const { getMenus } = stytemStore
 const { menus, menusTree } = storeToRefs(stytemStore)
 const loading = ref(false)
 const menuTitle = ref('新增菜单')
+const isIndeterminate = ref(false)
+const isIndeterminate1 = ref(false)
+const checkedCities = ref([])
+const checkedCities1 = ref([])
+const cities = ref([])
+const cities1 = ref([])
+const paginationForm = ref({
+  pageNum: 1,
+  pageSize: 20,
+})
+const total = ref(0)
+const checkAll = ref(false)
+const checkAll1 = ref(false)
 const formMenu = ref({
 })
 const columns = ref([
@@ -100,10 +117,10 @@ const addRules = reactive({
 async function submitMenuForm(formEl) {
   // eslint-disable-next-line style/max-statements-per-line
   if (!formEl) { return }
-
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (menuTitle.value === '新增菜单') {
+        addForm.value.api_ids = cities1.value.map(item => item.id)
         api.addRoute({ ...addForm.value }).then(() => {
           menukey.value = false
           toast.success('新增成功')
@@ -111,6 +128,7 @@ async function submitMenuForm(formEl) {
         })
       }
       else {
+        addForm.value.api_ids = cities1.value.map(item => item.id)
         api.patchRoute(addForm.value.id, { ...addForm.value }).then(() => {
           menukey.value = false
           toast.success('修改成功')
@@ -134,13 +152,24 @@ function addMenu() {
     display: true,
   }
 }
-function handleEdit(row) {
+// 获取菜单详情
+async function getMenuDetail(id) {
+  try {
+    const response = await api.getRouteInfo(id)
+    addForm.value = response.data
+
+    cities1.value = response.data.apis
+  }
+  catch (error) {
+    console.error('获取菜单详情失败:', error)
+  }
+}
+// 点击编辑
+async function handleEdit(row) {
   menuTitle.value = '编辑菜单'
   menukey.value = true
-
-  addForm.value = {
-    ...row,
-  }
+  await getMenuDetail(row.id)
+  generateData()
 }
 // 删除菜单
 async function handleDelete(row) {
@@ -174,6 +203,67 @@ function reset() {
   }
   getMenus()
 }
+async function seleceMenu() {
+  loading.value = false
+  await getMenus(formMenu.value)
+  loading.value = true
+}
+
+function change(value) {
+  paginationForm.value.pageNum = value
+  cities.value = generateData().filter((i) => {
+    return !cities1.value.find(item => item.id === i.id)
+  })
+}
+
+function handleCheckAllChange(val) {
+  checkedCities.value = val ? cities.value : []
+  isIndeterminate.value = false
+}
+
+function handleCheckAllChange1(val) {
+  checkedCities1.value = val ? cities1.value : []
+  isIndeterminate1.value = false
+}
+
+function handleCheckedCitiesChange(value) {
+  const checkedCount = value.length
+  checkAll.value = checkedCount === cities.value.length
+  isIndeterminate.value = checkedCount > 0 && checkedCount < cities.value.length
+}
+
+function handleCheckedCitiesChange1(value) {
+  const checkedCount = value.length
+  checkAll1.value = checkedCount === cities1.value.length
+  isIndeterminate1.value = checkedCount > 0 && checkedCount < cities1.value.length
+}
+
+function xuan() {
+  if (checkedCities.value.length > 0) {
+    cities1.value.push(...checkedCities.value)
+    cities.value = cities.value.filter((item) => {
+      return !cities1.value.includes(item)
+    })
+    checkedCities.value = []
+  }
+}
+
+async function xuan2() {
+  if (checkedCities1.value.length > 0) {
+    cities.value.push(...checkedCities1.value)
+    cities1.value = cities1.value.filter((i) => {
+      return !cities.value.find(item => item.id === i.id)
+    })
+  }
+}
+// 请求接口权限
+async function generateData() {
+  const res = await api.getApilist({ ...paginationForm.value })
+  checkedCities1.value = []
+  cities.value = res.data.items.filter((i) => {
+    return !cities1.value.find(item => item.id === i.id)
+  })
+}
 </script>
 
 <template>
@@ -181,19 +271,19 @@ function reset() {
     <FaPageMain class="mb-0">
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm :model="formMenu" size="default" label-width="120px" @keyup.enter="getMenus(formMenu)">
+          <ElForm :model="formMenu" label-width="120px" size="default" @keyup.enter="getMenus(formMenu)">
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="菜单名称">
-                  <ElInput v-model="formMenu.name" placeholder="请输入" clearable />
+                  <ElInput v-model="formMenu.name" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="类型">
                   <ElSelect v-model="formMenu.type_id" clearable placeholder="请选择">
-                    <ElOption label="目录" :value="0" />
-                    <ElOption label="菜单" :value="1" />
-                    <ElOption label="按钮" :value="2" />
+                    <ElOption :value="0" label="目录" />
+                    <ElOption :value="1" label="菜单" />
+                    <ElOption :value="2" label="按钮" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
@@ -231,8 +321,8 @@ function reset() {
         </ElButton>
       </div>
       <DataTable
-        row-key="id" :data-list="menus" :columns="columns" :operate="true"
-        :default-expand-all="defaultExpandAll" :loading="loading" @edit="handleEdit" @delete="handleDelete"
+        :columns="columns" :data-list="menus" :default-expand-all="defaultExpandAll" :loading="loading"
+        :operate="true" row-key="id" @delete="handleDelete" @edit="handleEdit"
       >
         <template #status="{ date }">
           <!-- {{ date }} -->
@@ -256,17 +346,17 @@ function reset() {
         </template>
       </DataTable>
     </FaPageMain>
-    <ElDialog v-model="menukey" :title="menuTitle" width="800">
-      <ElForm ref="addFormRef" :model="addForm" size="default" label-width="120px" :rules="addRules">
+    <ElDrawer v-model="menukey" :title="menuTitle" size="40%">
+      <ElForm ref="addFormRef" :model="addForm" :rules="addRules" label-width="120px" size="default">
         <ElRow>
           <ElCol :span="12">
             <ElFormItem label="菜单名称" prop="name">
-              <ElInput v-model="addForm.name" placeholder="请输入" clearable />
+              <ElInput v-model="addForm.name" clearable placeholder="请输入" />
             </ElFormItem>
           </ElCol>
           <ElCol :span="12">
             <ElFormItem label="父级菜单" prop="parent_id">
-              <ElTreeSelect v-model="addForm.parent_id" :data="menusTree" placeholder="请输入" clearable check-strictly />
+              <ElTreeSelect v-model="addForm.parent_id" :data="menusTree" check-strictly clearable placeholder="请输入" />
             </ElFormItem>
           </ElCol>
         </ElRow>
@@ -288,7 +378,59 @@ function reset() {
         <ElRow>
           <ElCol :span="12">
             <ElFormItem label="权限标识" prop="perms">
-              <ElInput v-model="addForm.perms" placeholder="请输入" clearable />
+              <ElInput v-model="addForm.perms" clearable placeholder="请输入" />
+            </ElFormItem>
+          </ElCol>
+        </ElRow>
+        <ElRow>
+          <ElCol :span="24">
+            <ElFormItem label="接口选择" prop="api">
+              <div class="align-center w-full flex justify-between">
+                <div class="left">
+                  <el-checkbox
+                    v-model="checkAll"
+                    :indeterminate="isIndeterminate"
+                    @change="handleCheckAllChange"
+                  >
+                    全选
+                  </el-checkbox>
+                  <el-checkbox-group
+                    v-model="checkedCities"
+                    @change="handleCheckedCitiesChange"
+                  >
+                    <el-checkbox v-for="city in cities" :key="city" :label="city.name" :value="city">
+                      {{ city.name }}
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </div>
+                <div>
+                  <el-button-group>
+                    <el-button :icon="ArrowLeft" type="primary" @click="xuan2" />
+                    <el-button :icon="ArrowRight" type="primary" @click="xuan" />
+                  </el-button-group>
+                </div>
+                <div class="right">
+                  <el-checkbox
+                    v-model="checkAll1"
+                    :indeterminate="isIndeterminate1"
+                    @change="handleCheckAllChange1"
+                  >
+                    全选
+                  </el-checkbox>
+                  <el-checkbox-group
+                    v-model="checkedCities1"
+                    @change="handleCheckedCitiesChange1"
+                  >
+                    <el-checkbox v-for="city in cities1" :key="city" :label="city.name" :value="city">
+                      {{ city.name }}
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </div>
+              </div>
+              <el-pagination
+                :pager-count="5" :total="total" background size="small" style="margin-top: 10px"
+                @current-change="change"
+              />
             </ElFormItem>
           </ElCol>
         </ElRow>
@@ -318,16 +460,42 @@ function reset() {
           </ElFormItem>
         </ElRow>
       </ElForm>
-    </ElDialog>
+    </ElDrawer>
   </div>
 </template>
 
-<style scoped lang='scss'>
+<style lang='scss' scoped>
 .absolute-container {
   position: absolute;
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+}
+:deep() {
+  .el-checkbox-group {
+    display: flex;
+    flex-direction: column;
+
+  }
+}
+
+.left {
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  padding: 10px;
+  width: 30%;
+  height: 400px;
+  overflow: auto;
+}
+
+.right {
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  padding: 10px;
+  width: 30%;
+  height: 400px;
+  overflow: auto;
+
 }
 </style>

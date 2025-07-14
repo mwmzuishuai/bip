@@ -1,10 +1,12 @@
 <script setup>
-import useStystemStore from '@/store/modules/system'
-import api from '@/api/modules/system'
 import { ElMessageBox } from 'element-plus'
 import { ElCol, ElRow } from 'element-plus'
+import api from '@/api/modules/system'
+import useStystemStore from '@/store/modules/system'
+
 const stystemStore = useStystemStore()
 import { toast } from 'vue-sonner'
+
 const { depts, deptsTreeTvalue } = storeToRefs(stystemStore)
 const { getDepts } = stystemStore
 const deptForm = ref({
@@ -29,7 +31,7 @@ const columns = ref([
     prop: 'phone',
     label: '联系电话',
     width: '200',
-    align: 'center'
+    align: 'center',
   },
   {
     prop: 'create_time',
@@ -95,13 +97,13 @@ function addDept() {
 
   }
 }
-//编辑菜单
+// 编辑菜单
 function handleEdit(row) {
   drawerKey.value = true
   DrawerTitle.value = '编辑部门'
   deptForm.value = row
 }
-//删除部门
+// 删除部门
 async function handleDelete(row) {
   try {
     await ElMessageBox.confirm('是否确认删除?', '删除用户', {
@@ -130,9 +132,11 @@ async function handleDelete(row) {
 function search() {
 }
 
-//保存
+// 保存
 async function saveDeptPermissions(formEl) {
-  if (!formEl) { return }
+  if (!formEl) {
+    return
+  }
   await formEl.validate((valid) => {
     if (valid) {
       if (DrawerTitle.value === '新增部门') {
@@ -141,7 +145,8 @@ async function saveDeptPermissions(formEl) {
           drawerKey.value = false
           getDepts()
         })
-      } else {
+      }
+      else {
         api.patchDept(deptForm.value.id, { ...deptForm.value }).then(() => {
           toast.success('编辑成功')
           drawerKey.value = false
@@ -203,8 +208,10 @@ async function saveDeptPermissions(formEl) {
           展开折叠
         </ElButton>
       </div>
-      <DataTable row-key="id" :data-list="depts" :columns="columns" :operate="true"
-        :default-expand-all="defaultExpandAll" @edit="handleEdit" @delete="handleDelete">
+      <DataTable
+        row-key="id" :data-list="depts" :columns="columns" :operate="true"
+        :default-expand-all="defaultExpandAll" @edit="handleEdit" @delete="handleDelete"
+      >
         <template #status="{ date }">
           <!-- {{ date }} -->
           <ElTag v-if="date.status === 1" type="success">
@@ -220,7 +227,7 @@ async function saveDeptPermissions(formEl) {
       </DataTable>
     </FaPageMain>
     <ElDrawer v-model="drawerKey" size="40%" :title="DrawerTitle">
-      <ElForm :model="deptForm" ref="deptFormRef" :rules="rules" label-width="100px" class="demo-drawer-form">
+      <ElForm ref="deptFormRef" :model="deptForm" :rules="rules" label-width="100px" class="demo-drawer-form">
         <ElRow>
           <ElCol :span="12">
             <ElFormItem label="部门名称" prop="name">
@@ -241,8 +248,10 @@ async function saveDeptPermissions(formEl) {
           </ElCol>
           <ElCol :span="12">
             <ElFormItem label="父级部门" prop="parent_id">
-              <ElTreeSelect v-model="deptForm.parent_id" placeholder="请选择" :data="deptsTreeTvalue" clearable
-                check-strictly />
+              <ElTreeSelect
+                v-model="deptForm.parent_id" placeholder="请选择" :data="deptsTreeTvalue" clearable
+                check-strictly
+              />
             </ElFormItem>
           </ElCol>
         </ElRow>

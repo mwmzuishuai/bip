@@ -35,6 +35,16 @@ const routes: RouteRecordRaw = {
       },
     },
     {
+      path: 'interface',
+      name: 'interface',
+      component: () => import('@/views/system/api.vue'),
+      meta: {
+        title: '接口管理',
+        icon: 'material-symbols:api',
+        auth: ['sys:api:view'],
+      },
+    },
+    {
       path: 'dept',
       name: 'dept',
       component: () => import('@/views/system/dept.vue'),

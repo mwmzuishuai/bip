@@ -1,9 +1,7 @@
 <script setup>
-import dayjs from 'dayjs'
 import { ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
-import { number } from 'zod'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
 
@@ -12,19 +10,12 @@ const { deptsTreeTvalue } = storeToRefs(stytemStore)
 const titleDrawer = ref('新增用户')
 const addFormRef = ref(null)
 const dtawerKey = ref(false)
-const delectList = ref([])
 const deptList = ref([])
 const formUser = ref({
   page: 1,
   size: 10,
 })
 const drwawerForm = ref({
-  username: '',
-  phone: '',
-  gender: null,
-  is_active: '',
-  nickname: '',
-  password: '',
 })
 const addRules = reactive({
   username: [
@@ -165,11 +156,17 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop: 'dept_id',
+    prop: 'dept_name',
     label: '部门',
     width: '200',
     align: 'center',
-    render:true,
+  },
+  {
+    prop: 'role_names',
+    label: '角色',
+    width: '200',
+    align: 'center',
+    render: true,
   },
   {
     prop: 'is_active',
@@ -207,9 +204,6 @@ const roleList = ref([])
 function isgetRolelist() {
   api.getRolelist({ page: 1, size: 200 }).then((res) => {
     roleList.value = res.data.items
-  })
-  api.getDeptList().then((res) => {
-    deptList.value = res.data.items
   })
 }
 async function dalete(val) {
@@ -263,7 +257,18 @@ function handleEdit(val) {
 // 获取用户信息
 function getUserInfos(id) {
   api.getUserInfo(id).then((res) => {
-    drwawerForm.value = res.data
+    drwawerForm.value = {
+      id: res.data.id,
+      username: res.data.username,
+      nickname: res.data.nickname,
+      gender: res.data.gender,
+      email: res.data.email,
+      phone: res.data.phone,
+      avatar: res.data.avatar,
+      is_active: res.data.is_active,
+      dept_id: res.data.dept_id,
+      role_ids: res.data.role_ids,
+    }
   })
 }
 // 修改用户信息
@@ -341,39 +346,39 @@ watch(() => formUser.value, () => {
     <FaPageMain>
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm :model="formUser" size="default" label-width="120px" @keydown.enter="searchList">
+          <ElForm :model="formUser" label-width="120px" size="default" @keydown.enter="searchList">
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="用户名称">
-                  <ElInput v-model="formUser.username" placeholder="请输入" clearable />
+                  <ElInput v-model="formUser.username" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="手机号">
-                  <ElInput v-model="formUser.phone" placeholder="请输入" clearable />
+                  <ElInput v-model="formUser.phone" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="状态">
                   <ElSelect v-model="formUser.is_active" clearable placeholder="请选择">
-                    <ElOption label="已禁用" :value="false" />
-                    <ElOption label="已启动" :value="true" />
+                    <ElOption :value="false" label="已禁用" />
+                    <ElOption :value="true" label="已启动" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="创建日期">
                   <el-date-picker
-                    v-model="formUser.create_time" type="daterange" range-separator="-"
-                    start-placeholder="开始日期" end-placeholder="结束日期" value-format="YYYY-MM-DD" placeholder="选择日期范围"
+                    v-model="formUser.create_time" end-placeholder="结束日期" placeholder="选择日期范围"
+                    range-separator="-" start-placeholder="开始日期" type="daterange" value-format="YYYY-MM-DD"
                   />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="部门" prop="parent_id">
                   <ElTreeSelect
-                    v-model="formUser.dept_id" :data="deptsTreeTvalue" placeholder="请输入" clearable
-                    check-strictly
+                    v-model="formUser.dept_id" :data="deptsTreeTvalue" check-strictly clearable
+                    placeholder="请输入"
                   />
                 </ElFormItem>
               </ElCol>
@@ -411,15 +416,15 @@ watch(() => formUser.value, () => {
         </ElButton>
       </div>
       <DataTable
-        :columns="columns" :data-list="dataList" :operate="true" :pagination="pagination" :loading="loading"
-        @edit="handleEdit" @delete="dalete" @current-change="handleCurrentChange" @size-change="handleSizeChange"
+        :columns="columns" :data-list="dataList" :loading="loading" :operate="true" :pagination="pagination"
+        @delete="dalete" @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
         @selection-change="handleSelectionChange"
       >
         <template #is_active="{ date }">
           <!-- {{ date }} -->
           <ElSwitch
-            v-model="date.is_active" inline-prompt active-text="已启动" inactive-text="已禁止" size="large"
-            class="switch-container" :before-change="handleBeforeSwitchChange" @change="handleSwitchChange(date)"
+            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            inline-prompt size="large" @change="handleSwitchChange(date)"
           />
         </template>
         <template #gender="{ date }">
@@ -428,33 +433,46 @@ watch(() => formUser.value, () => {
         <template #dept_id="{ date }">
           {{ deptList.value?.find((item) => item.id === date.dept_id)?.name }}
         </template>
+        <template #role_names="{ date }">
+          <div class="flex flex-col justify-center" style=" align-items: center;">
+            <el-tag
+              v-for="item in date.role_names" :key="item" style=" max-width: 50%;margin: 10px 0;"
+              type="success"
+            >
+              {{ item }}
+            </el-tag>
+          </div>
+        </template>
       </DataTable>
     </FaPageMain>
     <ElDrawer v-model="dtawerKey" :title="titleDrawer" size="40%">
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm ref="addFormRef" :model="drwawerForm" size="default" label-width="120px" :rules="addRules">
+          <ElForm ref="addFormRef" :model="drwawerForm" :rules="addRules" label-width="120px" size="default">
             <ElRow>
-              <ElCol :span="12">
+              <ElCol v-if="titleDrawer === '新增用户'" :span="12">
                 <ElFormItem label="用户名称" prop="username">
-                  <ElInput v-model="drwawerForm.username" placeholder="请输入" clearable />
+                  <ElInput v-model="drwawerForm.username" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="12">
                 <ElFormItem label="归属部门" prop="dept_id">
-                  <ElTreeSelect v-model="drwawerForm.dept_id" placeholder="请选择" :data="deptsTreeTvalue" clearable check-strictly />
+                  <ElTreeSelect
+                    v-model="drwawerForm.dept_id" :data="deptsTreeTvalue" check-strictly clearable
+                    placeholder="请选择"
+                  />
                 </ElFormItem>
               </ElCol>
             </ElRow>
             <ElRow>
               <ElCol :span="12">
                 <ElFormItem label="手机号码" prop="phone">
-                  <ElInput v-model="drwawerForm.phone" placeholder="请输入" clearable />
+                  <ElInput v-model="drwawerForm.phone" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="12">
                 <ElFormItem label="邮箱" prop="email">
-                  <ElInput v-model="drwawerForm.email" placeholder="请输入" clearable />
+                  <ElInput v-model="drwawerForm.email" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
             </ElRow>
@@ -486,22 +504,22 @@ watch(() => formUser.value, () => {
             </ElRow>
             <ElRow>
               <ElCol :span="12">
-                <ElFormItem label="角色" prop="role">
-                  <ElSelect v-model="drwawerForm.role" clearable placeholder="请选择" multiple filterable>
+                <ElFormItem label="角色" prop="role_ids">
+                  <ElSelect v-model="drwawerForm.role_ids" clearable filterable multiple placeholder="请选择">
                     <ElOption v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
               <ElCol :span="12">
                 <ElFormItem label="昵称" prop="nickname">
-                  <ElInput v-model="drwawerForm.nickname" placeholder="请输入" clearable />
+                  <ElInput v-model="drwawerForm.nickname" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
             </ElRow>
             <ElRow>
               <ElCol v-if="titleDrawer === '新增用户'" :span="12">
                 <ElFormItem label="密码" prop="password">
-                  <ElInput v-model="drwawerForm.password" placeholder="请输入" clearable type="password" />
+                  <ElInput v-model="drwawerForm.password" clearable placeholder="请输入" type="password" />
                 </ElFormItem>
               </ElCol>
             </ElRow>

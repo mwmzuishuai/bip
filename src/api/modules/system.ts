@@ -13,18 +13,20 @@ export default {
   deleteUser: (id: string) => api.delete(`/sys/users/${id}`),
   // 获取所有部门树架构
   getTreeDepts: () => api.get('/sys/depts/tree'),
-  //获取部门列表
-  getDeptList:()=>api.get('/sys/depts'),
-  //添加部门
-  addDept:(data:any)=>api.post('/sys/depts',{...data}),
-  //删除部门
-  deleteDept:(id:string)=>api.delete(`/sys/depts/${id}`),
-  //修改部门
-  patchDept:(id:string,data:any)=>api.patch(`/sys/depts/${id}`,data),
+  // 获取部门列表
+  getDeptList: () => api.get('/sys/depts'),
+  // 添加部门
+  addDept: (data: any) => api.post('/sys/depts', { ...data }),
+  // 删除部门
+  deleteDept: (id: string) => api.delete(`/sys/depts/${id}`),
+  // 修改部门
+  patchDept: (id: string, data: any) => api.patch(`/sys/depts/${id}`, data),
   // 获取所有菜单树结构
   routeList: (data: any) => api.get('/sys/menus/tree', { params: { ...data } }),
   // 新增菜单
   addRoute: (data: any) => api.post('/sys/menus', data),
+  // 获取菜单详情
+  getRouteInfo: (id: number) => api.get(`/sys/menus/${id}`),
   // 修改菜单
   patchRoute: (id: number, data: any) => api.patch(`/sys/menus/${id}`, data),
   // 删除菜单
@@ -37,4 +39,15 @@ export default {
   postRoleInfo: (data: any) => api.post(`/sys/roles`, data),
   // 获取角色信息的详细数据
   getRoleInfo: (id: number) => api.get(`/sys/roles/${id}`),
+
+  // 获取接口列表
+  getApilist: (data: any) => api.get('/sys/apis', { params: { ...data } }),
+  // 修改接口信息
+  patchApiInfo: (id: number, data: any) => api.patch(`/sys/apis/${id}`, data),
+  // 新增接口信息
+  postApiInfo: (data: any) => api.post(`/sys/apis`, data),
+  // 获取接口信息的详细数据
+  getApiInfo: (id: number) => api.get(`/sys/apis/${id}`),
+  // 删除接口信息
+  deleteApi: (id: number) => api.delete(`/sys/apis/${id}`),
 }

@@ -1,15 +1,16 @@
 <script setup>
+import api from '@/api/modules/log.ts'
 // 表格相关
 const formOperate = ref({
   page: 1,
   size: 10,
 })
-const dataList = ref([])
-const loading = ref(false)
 const pagination = ref({
   pageSizes: [10, 20, 30, 40],
   total: 0,
 })
+const dataList = ref([])
+const loading = ref(false)
 const columns = ref([
   {
     prop: 'username',
@@ -42,12 +43,6 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop: 'dateTime',
-    label: '操作时间',
-    width: '260',
-    align: 'center',
-  },
-  {
     prop: 'country',
     label: '国家',
     width: '160',
@@ -58,6 +53,7 @@ const columns = ref([
     label: '操作状态',
     width: '260',
     align: 'center',
+    render: true,
   },
   {
     prop: 'code',
@@ -84,30 +80,28 @@ const columns = ref([
     align: 'center',
   },
 ])
-
 function handleCurrentChange(val) {
   formOperate.value.page = val
+  getList()
 }
 function handleSizeChange(val) {
   formOperate.value.size = val
+  getList()
 }
-//获取操作日志列表
-function getOperateList (){
-  api.getOperateList(formOperate.value).then(res => {
-    dataList.value = res.data
-  })
-}
-//重置
-function resetForm (){
-  formOperate.value = {
-    page: 1,
-    size: 10,
+async function getList() {
+  loading.value = true
+  const form = { ...formOperate.value }
+  if (form.create_time) {
+    form.create_time = form.create_time.join(',')
   }
-  getOperateList()
+  const res = await api.getOperateList({ ...form })
+  dataList.value = res.data.items
+  pagination.value.total = res.data.total
+  loading.value = false
 }
 onMounted(() => {
-  // getOperateList()
-});
+  getList()
+})
 </script>
 
 <template>
@@ -115,7 +109,7 @@ onMounted(() => {
     <FaPageMain>
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm :model="formOperate" size="default" label-width="120px" @keyup.enter="getOperateList">
+          <ElForm :model="formOperate" size="default" label-width="120px" @keyup.enter="getList" >
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="用户名称">
@@ -134,23 +128,21 @@ onMounted(() => {
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="操作日期">
-                  <el-date-picker
-                    v-model="formOperate.create_time" type="daterange" range-separator="-"
+                  <el-date-picker v-model="formOperate.create_time"  type="datetimerange" range-separator="-"
                     start-placeholder="开始日期" end-placeholder="结束日期" value-format="YYYY-MM-DD HH:mm:ss"
-                    placeholder="选择日期范围"
-                  />
+                    placeholder="选择日期范围" />
                 </ElFormItem>
               </ElCol>
             </ElRow>
             <ElRow>
               <ElFormItem>
-                <ElButton type="primary" @click="getOperateList">
+                <ElButton type="primary" @click="getList">
                   <template #icon>
                     <FaIcon name="i-ep:search" />
                   </template>
                   搜索
                 </ElButton>
-                <ElButton @click="resetForm">
+                <ElButton>
                   重置
                 </ElButton>
               </ElFormItem>
@@ -160,10 +152,13 @@ onMounted(() => {
       </FaSearchBar>
     </FaPageMain>
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
-      <DataTable
-        :columns="columns" :data-list="dataList" :pagination="pagination" :loading="loading"
-        @current-change="handleCurrentChange" @size-change="handleSizeChange"
-      />
+      <DataTable :columns="columns" :data-list="dataList" :pagination="pagination" :loading="loading"
+        @current-change="handleCurrentChange" @size-change="handleSizeChange">
+        <template #status="{ date }">
+          {{ date.status ? '成功' : '失败' }}
+        </template>
+
+      </DataTable>
     </FaPageMain>
   </div>
 </template>
