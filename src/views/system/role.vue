@@ -169,8 +169,10 @@ async function saveRolePermissions(formEl) {
   await formEl.validate((valid) => {
     if (valid) {
       if (roleTitle.value === '编辑角色') {
+        const obj = { ...patchForm.value }
+        delete obj.update_time
         api.patchRoleInfo(patchForm.value.id, {
-          ...patchForm.value,
+          ...obj,
           menu_ids: [...treeRef.value.getHalfCheckedKeys(), ...treeRef.value.getCheckedKeys()],
         }).then(() => {
           roleDrawerKey.value = false

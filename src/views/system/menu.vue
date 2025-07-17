@@ -1,8 +1,4 @@
 <script setup>
-import {
-  ArrowLeft,
-  ArrowRight,
-} from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
 import { toast } from 'vue-sonner'
 import api from '@/api/modules/system'
@@ -13,19 +9,8 @@ const { getMenus } = stytemStore
 const { menus, menusTree } = storeToRefs(stytemStore)
 const loading = ref(false)
 const menuTitle = ref('新增菜单')
-const isIndeterminate = ref(false)
-const isIndeterminate1 = ref(false)
-const checkedCities = ref([])
-const checkedCities1 = ref([])
-const cities = ref([])
 const cities1 = ref([])
-const paginationForm = ref({
-  page: 1,
-  size: 20,
-})
-const total = ref(0)
-const checkAll = ref(false)
-const checkAll1 = ref(false)
+
 const formMenu = ref({
 })
 const columns = ref([
@@ -43,7 +28,7 @@ const columns = ref([
     render: true,
   },
   {
-    prop: 'perms',
+    prop: 'permission_code',
     label: '权限标识',
     width: '400',
     align: 'center',
@@ -72,7 +57,7 @@ const addFormRef = ref(null)
 const addForm = ref({
   parent_id: null, // 初始化 parent_id 为 null
   type: 0,
-  perms: '',
+  permission_code: '',
   display: true,
 })
 const addRules = reactive({
@@ -90,7 +75,7 @@ const addRules = reactive({
       trigger: 'blur',
     },
   ],
-  perms: [
+  permission_code: [
     { required: true, message: '请输入权限标识', trigger: 'blur' },
     {
       validator: (rule, value, callback) => {
@@ -120,7 +105,6 @@ async function submitMenuForm(formEl) {
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (menuTitle.value === '新增菜单') {
-        addForm.value.api_ids = cities1.value.map(item => item.id)
         api.addRoute({ ...addForm.value }).then(() => {
           menukey.value = false
           toast.success('新增成功')
@@ -128,7 +112,6 @@ async function submitMenuForm(formEl) {
         })
       }
       else {
-        addForm.value.api_ids = cities1.value.map(item => item.id)
         api.patchRoute(addForm.value.id, { ...addForm.value }).then(() => {
           menukey.value = false
           toast.success('修改成功')
@@ -148,10 +131,10 @@ function addMenu() {
     title: '',
     parent_id: null, // 初始化 parent_id 为 null
     type: 0,
-    perms: '',
+    permission_code: '',
     display: true,
   }
-  generateData()
+  // generateData()
 }
 // 获取菜单详情
 async function getMenuDetail(id) {
@@ -171,7 +154,7 @@ async function handleEdit(row) {
   menuTitle.value = '编辑菜单'
   menukey.value = true
   await getMenuDetail(row.id)
-  generateData()
+  // generateData()
 }
 // 删除菜单
 async function handleDelete(row) {
@@ -205,71 +188,6 @@ function reset() {
   }
   getMenus()
 }
-async function seleceMenu() {
-  loading.value = false
-  await getMenus(formMenu.value)
-  loading.value = true
-}
-
-function change(value) {
-  paginationForm.value.page = value
-  cities.value = generateData().filter((i) => {
-    return !cities1.value.find(item => item.id === i.id)
-  })
-}
-
-function handleCheckAllChange(val) {
-  checkedCities.value = val ? cities.value : []
-  isIndeterminate.value = false
-}
-
-function handleCheckAllChange1(val) {
-  checkedCities1.value = val ? cities1.value : []
-  isIndeterminate1.value = false
-}
-
-function handleCheckedCitiesChange(value) {
-  const checkedCount = value.length
-  checkAll.value = checkedCount === cities.value.length
-  isIndeterminate.value = checkedCount > 0 && checkedCount < cities.value.length
-}
-
-function handleCheckedCitiesChange1(value) {
-  const checkedCount = value.length
-  checkAll1.value = checkedCount === cities1.value.length
-  isIndeterminate1.value = checkedCount > 0 && checkedCount < cities1.value.length
-}
-
-function xuan() {
-  if (checkedCities.value.length > 0) {
-    cities1.value.push(...checkedCities.value)
-    cities.value = cities.value.filter((item) => {
-      return !cities1.value.includes(item)
-    })
-    checkedCities.value = []
-    handleCheckedCitiesChange(cities.value)
-  }
-}
-
-async function xuan2() {
-  if (checkedCities1.value.length > 0) {
-    cities.value.push(...checkedCities1.value)
-    checkedCities1.value = []
-    cities1.value = cities1.value.filter((i) => {
-      return !cities.value.find(item => item.id === i.id)
-    })
-  }
-}
-// 请求接口权限
-async function generateData() {
-  const res = await api.getApilist({ ...paginationForm.value })
-  total.value = res.data.total
-  checkedCities1.value = []
-  cities.value = res.data.items.filter((i) => {
-    return !cities1.value.find(item => item.id === i.id)
-  })
-}
-// 获取菜单
 
 async function huoquMenu() {
   loading.value = true
@@ -393,64 +311,14 @@ onMounted(() => {
         </ElRow>
         <ElRow>
           <ElCol :span="12">
-            <ElFormItem label="权限标识" prop="perms">
-              <ElInput v-model="addForm.perms" clearable placeholder="请输入" />
+            <ElFormItem label="权限标识" prop="permission_code">
+              <ElInput v-model="addForm.permission_code" clearable placeholder="请输入" />
             </ElFormItem>
           </ElCol>
         </ElRow>
         <ElRow>
-          <ElCol :span="24">
-            <ElFormItem label="接口选择" prop="api">
-              <div class="w-full flex justify-between" style="align-items: center">
-                <div class="left">
-                  <header>接口选择</header>
-                  <el-checkbox
-                    v-model="checkAll"
-                    :indeterminate="isIndeterminate"
-                    @change="handleCheckAllChange"
-                  >
-                    全选
-                  </el-checkbox>
-                  <el-checkbox-group
-                    v-model="checkedCities"
-                    @change="handleCheckedCitiesChange"
-                  >
-                    <el-checkbox v-for="city in cities" :key="city" :label="city.name" :value="city">
-                      {{ city.name }}
-                    </el-checkbox>
-                  </el-checkbox-group>
-                </div>
-                <div style="height:10px">
-                  <el-button-group>
-                    <el-button :icon="ArrowLeft" type="primary" @click="xuan2" />
-                    <el-button :icon="ArrowRight" type="primary" @click="xuan" />
-                  </el-button-group>
-                </div>
-                <div class="right">
-                  <header>已选接口</header>
-                  <el-checkbox
-                    v-model="checkAll1"
-                    :indeterminate="isIndeterminate1"
-                    @change="handleCheckAllChange1"
-                  >
-                    全选
-                  </el-checkbox>
-                  <el-checkbox-group
-                    v-model="checkedCities1"
-                    @change="handleCheckedCitiesChange1"
-                  >
-                    <el-checkbox v-for="city in cities1" :key="city" :label="city.name" :value="city">
-                      {{ city.name }}
-                    </el-checkbox>
-                  </el-checkbox-group>
-                </div>
-              </div>
-              <el-pagination
-                :default-page-size="20" :pager-count="5" :total="total" background size="small" style="margin-top: 10px"
-                @current-change="change"
-              />
-            </ElFormItem>
-          </ElCol>
+          <!--          <ElCol :span="24"> -->
+          <!--          </ElCol> -->
         </ElRow>
         <ElRow>
           <ElFormItem label="菜单状态" prop="display">
