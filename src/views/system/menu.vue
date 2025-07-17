@@ -20,8 +20,8 @@ const checkedCities1 = ref([])
 const cities = ref([])
 const cities1 = ref([])
 const paginationForm = ref({
-  pageNum: 1,
-  pageSize: 20,
+  page: 1,
+  size: 20,
 })
 const total = ref(0)
 const checkAll = ref(false)
@@ -151,6 +151,7 @@ function addMenu() {
     perms: '',
     display: true,
   }
+  generateData()
 }
 // 获取菜单详情
 async function getMenuDetail(id) {
@@ -159,6 +160,7 @@ async function getMenuDetail(id) {
     addForm.value = response.data
 
     cities1.value = response.data.apis
+    // total.value = response.data.total
   }
   catch (error) {
     console.error('获取菜单详情失败:', error)
@@ -210,7 +212,7 @@ async function seleceMenu() {
 }
 
 function change(value) {
-  paginationForm.value.pageNum = value
+  paginationForm.value.page = value
   cities.value = generateData().filter((i) => {
     return !cities1.value.find(item => item.id === i.id)
   })
@@ -245,6 +247,7 @@ function xuan() {
       return !cities1.value.includes(item)
     })
     checkedCities.value = []
+    handleCheckedCitiesChange(cities.value)
   }
 }
 
@@ -260,11 +263,23 @@ async function xuan2() {
 // 请求接口权限
 async function generateData() {
   const res = await api.getApilist({ ...paginationForm.value })
+  total.value = res.data.total
   checkedCities1.value = []
   cities.value = res.data.items.filter((i) => {
     return !cities1.value.find(item => item.id === i.id)
   })
 }
+// 获取菜单
+
+async function huoquMenu() {
+  loading.value = true
+  await stytemStore.getMenus()
+  loading.value = false
+}
+
+onMounted(() => {
+  huoquMenu()
+})
 </script>
 
 <template>
@@ -431,7 +446,7 @@ async function generateData() {
                 </div>
               </div>
               <el-pagination
-                :pager-count="5" :total="total" background size="small" style="margin-top: 10px"
+                :default-page-size="20" :pager-count="5" :total="total" background size="small" style="margin-top: 10px"
                 @current-change="change"
               />
             </ElFormItem>

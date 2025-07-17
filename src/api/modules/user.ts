@@ -3,7 +3,8 @@ import api from '../index'
 export default {
   // 登录
   login: (data: any) => api.post('/auth/login', data),
-
+  // 登出
+  logout: () => api.post('/auth/logout'),
   // 获取权限
   permission: () => api.get('/sys/permissions'),
   // permission: () => api.get('user/permission', {

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
@@ -101,7 +101,7 @@ onMounted(() => {
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
               <FaInput
-                type="text" placeholder="请输入用户名" class="w-full" :class="errors.length && 'border-destructive'"
+                :class="errors.length && 'border-destructive'" class="w-full" placeholder="请输入用户名" type="text"
                 v-bind="componentField"
               />
             </FormControl>
@@ -117,7 +117,7 @@ onMounted(() => {
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
               <FaInput
-                type="password" placeholder="请输入密码" class="w-full" :class="errors.length && 'border-destructive'"
+                :class="errors.length && 'border-destructive'" class="w-full" placeholder="请输入密码" type="password"
                 v-bind="componentField"
               />
             </FormControl>
@@ -134,11 +134,11 @@ onMounted(() => {
             <FormControl>
               <div class="flex-center-between">
                 <FaInput
-                  type="password" placeholder="请输入验证码" class="w-1xl"
-                  :class="errors.length && 'border-destructive'" v-bind="componentField"
+                  :class="errors.length && 'border-destructive'" class="w-1xl"
+                  placeholder="请输入验证码" v-bind="componentField"
                 />
                 <!-- 验证图片 -->
-                <img :src="codeUrl" alt="点击刷新" title="点击刷新" class="h-[40px] w-[100px]" @click="onRefreshCode">
+                <img :src="codeUrl" alt="点击刷新" class="h-[40px] w-[100px]" title="点击刷新" @click="onRefreshCode">
               </div>
             </FormControl>
             <Transition
@@ -151,7 +151,7 @@ onMounted(() => {
         </FormField>
         <div class="mb-4 flex-center-between">
           <div class="flex-center-start">
-            <FormField v-slot="{ componentField }" type="checkbox" name="remember">
+            <FormField v-slot="{ componentField }" name="remember" type="checkbox">
               <FormItem>
                 <FormControl>
                   <FaCheckbox v-bind="componentField">
@@ -162,13 +162,13 @@ onMounted(() => {
             </FormField>
           </div>
           <FaButton
-            variant="link" class="h-auto p-0" type="button"
+            class="h-auto p-0" type="button" variant="link"
             @click="emits('onResetPassword', form.values.username)"
           >
             忘记密码了?
           </FaButton>
         </div>
-        <FaButton :loading="loading" size="lg" class="w-full" type="submit">
+        <FaButton :loading="loading" class="w-full" size="lg" type="submit">
           登录
         </FaButton>
       </form>
@@ -176,7 +176,7 @@ onMounted(() => {
     </div>
     <div v-show="type === 'qrcode'">
       <div class="flex-col-center">
-        <img src="https://s2.loli.net/2024/04/26/GsahtuIZ9XOg5jr.png" class="h-[250px] w-[250px]">
+        <img class="h-[250px] w-[250px]" src="https://s2.loli.net/2024/04/26/GsahtuIZ9XOg5jr.png">
         <div class="mt-2 text-sm text-secondary-foreground op-50">
           请使用微信扫码登录
         </div>

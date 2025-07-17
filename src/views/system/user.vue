@@ -253,6 +253,8 @@ function handleEdit(val) {
   titleDrawer.value = '编辑用户'
   dtawerKey.value = true
   getUserInfos(val.id)
+  stytemStore.getDepts()
+  isgetRolelist()
 }
 // 获取用户信息
 function getUserInfos(id) {
@@ -323,6 +325,8 @@ function postUserInfos() {
   drwawerForm.value = {
 
   }
+  stytemStore.getDepts()
+  isgetRolelist()
 }
 // 多选
 function handleSelectionChange(val) {
@@ -332,7 +336,6 @@ function handleSelectionChange(val) {
 }
 onMounted(() => {
   getUserList()
-  isgetRolelist()
 })
 watch(() => formUser.value, () => {
 

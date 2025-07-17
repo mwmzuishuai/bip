@@ -156,6 +156,9 @@ async function saveDeptPermissions(formEl) {
     }
   })
 }
+onMounted(() => {
+  stystemStore.getDepts()
+})
 </script>
 
 <template>
@@ -163,18 +166,18 @@ async function saveDeptPermissions(formEl) {
     <FaPageMain class="mb-0">
       <FaSearchBar :show-toggle="false">
         <template #default>
-          <ElForm v-model="deptForm" size="default" label-width="120px" @keyup.enter="search">
+          <ElForm v-model="deptForm" label-width="120px" size="default" @keyup.enter="search">
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="部门名称" prop="deptName">
-                  <ElInput v-model="deptForm.deptName" placeholder="请输入" clearable />
+                  <ElInput v-model="deptForm.deptName" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="状态" prop="status">
                   <ElSelect v-model="deptForm.status" clearable placeholder="请选择">
-                    <ElOption label="正常" :value="1" />
-                    <ElOption label="停用" :value="2" />
+                    <ElOption :value="1" label="正常" />
+                    <ElOption :value="2" label="停用" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
@@ -209,8 +212,8 @@ async function saveDeptPermissions(formEl) {
         </ElButton>
       </div>
       <DataTable
-        row-key="id" :data-list="depts" :columns="columns" :operate="true"
-        :default-expand-all="defaultExpandAll" @edit="handleEdit" @delete="handleDelete"
+        :columns="columns" :data-list="depts" :default-expand-all="defaultExpandAll" :operate="true"
+        row-key="id" @delete="handleDelete" @edit="handleEdit"
       >
         <template #status="{ date }">
           <!-- {{ date }} -->
@@ -226,31 +229,31 @@ async function saveDeptPermissions(formEl) {
         </template>
       </DataTable>
     </FaPageMain>
-    <ElDrawer v-model="drawerKey" size="40%" :title="DrawerTitle">
-      <ElForm ref="deptFormRef" :model="deptForm" :rules="rules" label-width="100px" class="demo-drawer-form">
+    <ElDrawer v-model="drawerKey" :title="DrawerTitle" size="40%">
+      <ElForm ref="deptFormRef" :model="deptForm" :rules="rules" class="demo-drawer-form" label-width="100px">
         <ElRow>
           <ElCol :span="12">
             <ElFormItem label="部门名称" prop="name">
-              <ElInput v-model="deptForm.name" placeholder="请输入" clearable />
+              <ElInput v-model="deptForm.name" clearable placeholder="请输入" />
             </ElFormItem>
           </ElCol>
           <ElCol :span="12">
             <ElFormItem label="负责人" prop="leader">
-              <ElInput v-model="deptForm.leader" placeholder="请输入" clearable />
+              <ElInput v-model="deptForm.leader" clearable placeholder="请输入" />
             </ElFormItem>
           </ElCol>
         </ElRow>
         <ElRow>
           <ElCol :span="12">
             <ElFormItem label="联系电话" prop="phone">
-              <ElInput v-model="deptForm.phone" placeholder="请输入" clearable />
+              <ElInput v-model="deptForm.phone" clearable placeholder="请输入" />
             </ElFormItem>
           </ElCol>
           <ElCol :span="12">
             <ElFormItem label="父级部门" prop="parent_id">
               <ElTreeSelect
-                v-model="deptForm.parent_id" placeholder="请选择" :data="deptsTreeTvalue" clearable
-                check-strictly
+                v-model="deptForm.parent_id" :data="deptsTreeTvalue" check-strictly clearable
+                placeholder="请选择"
               />
             </ElFormItem>
           </ElCol>
@@ -268,7 +271,7 @@ async function saveDeptPermissions(formEl) {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .absolute-container {
   position: absolute;
   display: flex;

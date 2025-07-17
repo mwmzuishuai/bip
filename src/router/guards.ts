@@ -52,8 +52,6 @@ function setupRoutes(router: Router) {
         try {
           // 获取用户权限
           settingsStore.settings.app.enablePermission && await userStore.getPermissions()
-          await systemStore.getDepts()
-          await systemStore.getMenus()
           // 生成动态路由
           switch (settingsStore.settings.app.routeBaseOn) {
             case 'frontend':

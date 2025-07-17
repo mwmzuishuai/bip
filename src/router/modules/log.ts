@@ -21,18 +21,19 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '操作日志',
         icon: 'i-ant-design:FileSearchOutlined ',
-        // auth: ['sys:role:view'],
+        auth: ['log:opera:view'],
       },
     },
     {
-      path:'loginlog',
-      name:'loginlog',
-      component:()=>import('@/views/log/login.vue'),
-      meta:{
-        title:'登录日志',
-        icon:'i-ant-design:FileSearchOutlined '
-      }
-    }
+      path: 'loginlog',
+      name: 'loginlog',
+      component: () => import('@/views/log/login.vue'),
+      meta: {
+        title: '登录日志',
+        icon: 'i-ant-design:FileSearchOutlined ',
+        auth: ['log:login:view'],
+      },
+    },
   ],
 }
 

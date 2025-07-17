@@ -350,9 +350,10 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .apiBox{
-  width: 100%;
-  height: 100%;
+  position: absolute;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 </style>

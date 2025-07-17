@@ -88,6 +88,7 @@ function handleSizeChange(val) {
 async function handleEdit(row) {
   const res = await api.getRoleInfo(row.id)
   patchForm.value = { ...row }
+  stystemStore.getMenus()
   selectedMenuIds.value = res.data.menu_ids
   roleDrawerKey.value = true
   roleTitle.value = '编辑角色'
@@ -182,7 +183,9 @@ async function saveRolePermissions(formEl) {
           ...patchForm.value,
           menu_ids: [...treeRef.value.getHalfCheckedKeys(), ...treeRef.value.getCheckedKeys()],
         }).then(() => {
+          roleDrawerKey.value = false
           toast.success('保存成功')
+          getRolelist()
         })
       }
     }
@@ -199,11 +202,11 @@ onMounted(() => {
     <FaPageMain class="mb-0">
       <FaSearchBar>
         <template #default="{ fold }">
-          <ElForm :model="formRole" size="default" label-width="120px" @keyup.enter="getRolelist">
+          <ElForm :model="formRole" label-width="120px" size="default" @keyup.enter="getRolelist">
             <ElRow>
               <ElCol :span="12">
                 <ElFormItem label="角色名称">
-                  <ElInput v-model="formRole.name" placeholder="请输入" clearable />
+                  <ElInput v-model="formRole.name" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
             </ElRow>
@@ -211,8 +214,8 @@ onMounted(() => {
               <ElCol :span="6">
                 <ElFormItem label="状态">
                   <ElSelect v-model="formRole.is_active" clearable placeholder="请选择">
-                    <ElOption label="已禁用" :value="false" />
-                    <ElOption label="已启动" :value="true" />
+                    <ElOption :value="false" label="已禁用" />
+                    <ElOption :value="true" label="已启动" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
@@ -247,13 +250,13 @@ onMounted(() => {
         </ElButton>
       </div>
       <DataTable
-        :columns="columns" :data-list="dataList" :operate="operate" :pagination="pagination" @edit="handleEdit"
-        @delete="handleDelete" @current-change="handleCurrentChange" @size-change="handleSizeChange"
+        :columns="columns" :data-list="dataList" :operate="operate" :pagination="pagination" @delete="handleDelete"
+        @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
       >
         <template #is_active="{ date }">
           <ElSwitch
-            v-model="date.is_active" inline-prompt active-text="已启动" inactive-text="已禁止" size="large"
-            class="switch-container" :before-change="handleBeforeSwitchChange" @change="handleSwitchChange(date)"
+            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            inline-prompt size="large" @change="handleSwitchChange(date)"
           />
         </template>
       </DataTable>
@@ -262,11 +265,11 @@ onMounted(() => {
     <!-- 角色编辑抽屉 -->
     <ElDrawer v-model="roleDrawerKey" :title="roleTitle" size="50%">
       <div class="drawer-content">
-        <ElForm ref="addFormRef" :model="patchForm" size="default" label-width="120px" :rules="addRules">
+        <ElForm ref="addFormRef" :model="patchForm" :rules="addRules" label-width="120px" size="default">
           <ElRow>
             <ElCol :span="12">
               <ElFormItem label="角色名称" prop="name">
-                <ElInput v-model="patchForm.name" placeholder="请输入" clearable />
+                <ElInput v-model="patchForm.name" clearable placeholder="请输入" />
               </ElFormItem>
             </ElCol>
             <ElCol :span="12">
@@ -285,7 +288,7 @@ onMounted(() => {
           <ElRow>
             <ElCol :span="24">
               <ElFormItem label="备注">
-                <ElInput v-model="patchForm.remark" type="textarea" resize="none" placeholder="请输入内容" />
+                <ElInput v-model="patchForm.remark" placeholder="请输入内容" resize="none" type="textarea" />
               </ElFormItem>
             </ElCol>
           </ElRow>
@@ -293,7 +296,7 @@ onMounted(() => {
         <div style="margin-top: 10px;margin-bottom: 10px;">
           <ElSegmented v-model="treeKey" :options="options" size="large" />
         </div>
-        <ElTree ref="treeRef" show-checkbox :data="menusTree" node-key="id" :check-strictly="treeKey" />
+        <ElTree ref="treeRef" :check-strictly="treeKey" :data="menusTree" node-key="id" show-checkbox />
         <div class="action-buttons">
           <ElButton type="primary" @click="saveRolePermissions(addFormRef)">
             保存
@@ -307,7 +310,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .absolute-container {
   position: absolute;
   display: flex;
