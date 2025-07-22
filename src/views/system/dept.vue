@@ -3,13 +3,20 @@ import { ElMessageBox } from 'element-plus'
 import { ElCol, ElRow } from 'element-plus'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
+import useAuth from '@/utils/composables/useAuth'
 
+const { auth } = useAuth()
 const stystemStore = useStystemStore()
+import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
 const { depts, deptsTreeTvalue } = storeToRefs(stystemStore)
 const { getDepts } = stystemStore
 const deptForm = ref({
+})
+const auths = ref({
+  delete: auth('sys:dept:delete'),
+  edit: auth('sys:dept:edit'),
 })
 const deptFormRef = ref(null)
 const drawerKey = ref(false)
@@ -198,7 +205,7 @@ onMounted(() => {
     </FaPageMain>
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
       <div class="m-b-4 flex">
-        <ElButton type="primary" @click="addDept">
+        <ElButton v-auth="['sys:dept:add']" type="primary" @click="addDept">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>
@@ -212,7 +219,7 @@ onMounted(() => {
         </ElButton>
       </div>
       <DataTable
-        :columns="columns" :data-list="depts" :default-expand-all="defaultExpandAll" :operate="true"
+        :auth="auths" :columns="columns" :data-list="depts" :default-expand-all="defaultExpandAll" :operate="auths.delete || auths.edit"
         row-key="id" @delete="handleDelete" @edit="handleEdit"
       >
         <template #status="{ date }">

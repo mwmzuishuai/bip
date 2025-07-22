@@ -13,7 +13,7 @@ const useUserStore = defineStore(
     const routeStore = useRouteStore()
     const menuStore = useMenuStore()
     const tabbarStore = useTabbarStore()
-
+    const companyList = ref([])
     const account = ref(localStorage.account ?? '')
     const token = ref(localStorage.token ?? '')
     const avatar = ref(localStorage.avatar ?? '')
@@ -28,14 +28,23 @@ const useUserStore = defineStore(
     // 登录
     async function login(data: any) {
       const res = await apiUser.login(data)
-      localStorage.setItem('account', res.data.username)
       localStorage.setItem('token', res.data.access_token)
-      localStorage.setItem('avatar', res.data.avatar)
-      account.value = res.data.username || '小小'
-      token.value = res.data.access_token
-      avatar.value = res.data.avatar || ''
+      token.value = res.data.login_token
+      // const info = await apiUser.getInfo()
+      // account.value = info.data.nickname || '小小'
+      // avatar.value = info.data.avatar || ''
+      // localStorage.setItem('account', info.data.nickname)
+      // localStorage.setItem('avatar', info.data.avatar)
     }
-
+    // 选择公司
+    async function selectCompany(data: any) {
+      console.log(2222)
+    }
+    // 获取公司列表
+    async function getCompanyList() {
+      const res = await apiUser.getCompanyList()
+      companyList.value = res.data.tenants
+    }
     // 手动登出
     function logout(redirect = router.currentRoute.value.fullPath) {
       // 此处仅清除计算属性 isLogin 中判断登录状态过期的变量，以保证在弹出登录窗口模式下页面展示依旧正常
@@ -101,11 +110,14 @@ const useUserStore = defineStore(
       avatar,
       permissions,
       isLogin,
+      companyList,
       login,
       logout,
       requestLogout,
       getPermissions,
       editPassword,
+      selectCompany,
+      getCompanyList,
     }
   },
 )

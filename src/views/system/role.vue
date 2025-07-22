@@ -13,10 +13,13 @@ import useAuth from '@/utils/composables/useAuth'
 
 const addFormRef = ref(null)
 const { auth } = useAuth()
-const operate = ref({})
 const stystemStore = useStystemStore()
 const { menusTree } = storeToRefs(stystemStore)
 
+const auths = ref({
+  delete: auth('sys:role:delete'),
+  edit: auth('sys:role:edit'),
+})
 const roleTitle = ref('添加角色')
 const formRole = ref({
   page: 1,
@@ -252,7 +255,7 @@ onMounted(() => {
         </ElButton>
       </div>
       <DataTable
-        :columns="columns" :data-list="dataList" :operate="operate" :pagination="pagination" @delete="handleDelete"
+        :auth="auths" :columns="columns" :data-list="dataList" :operate="auths.delete || auths.edit" :pagination="pagination" @delete="handleDelete"
         @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
       >
         <template #is_active="{ date }">

@@ -4,7 +4,9 @@ import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
+import useAuth from '@/utils/composables/useAuth'
 
+const { auth } = useAuth()
 const stytemStore = useStystemStore()
 const { deptsTreeTvalue } = storeToRefs(stytemStore)
 const titleDrawer = ref('新增用户')
@@ -133,7 +135,7 @@ const columns = ref([
   {
     prop: 'username',
     label: '用户名称',
-    width: '260',
+    width: '160',
     align: 'center',
   },
   {
@@ -183,6 +185,10 @@ const columns = ref([
 ])
 const dataList = ref([
 ])
+const auths = ref({
+  delete: auth('sys:user:delete'),
+  edit: auth('sys:user:edit'),
+})
 async function getUserList() {
   const form = { ...formUser.value }
   if (form.create_time) {
@@ -227,9 +233,9 @@ async function dalete(val) {
   }
   catch (error) {
     // 错误处理（用户取消删除或API请求失败）
-    if (error !== 'cancel' && error !== 'close') {
-      toast.error('删除失败')
-    }
+    // if (error !== 'cancel' && error !== 'close') {
+    //   toast.error('删除失败')
+    // }
   }
 }
 function handleSizeChange(val) {
@@ -269,7 +275,7 @@ function getUserInfos(id) {
       avatar: res.data.avatar,
       is_active: res.data.is_active,
       dept_id: res.data.dept_id,
-      role_ids: res.data.role_ids,
+      roles: res.data.roles.map(r => r.id),
     }
   })
 }
@@ -405,13 +411,13 @@ watch(() => formUser.value, () => {
     </FaPageMain>
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
       <div class="m-[20px] m-b-4 flex">
-        <ElButton type="primary" @click="postUserInfos()">
+        <ElButton v-auth="['sys:user:add']" type="primary" @click="postUserInfos()">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>
           新增
         </ElButton>
-        <ElButton type="danger" @click="dalete()">
+        <ElButton v-auth="['sys:user:delete']" type="danger" @click="dalete()">
           <template #icon>
             <FaIcon name="i-ep:Delete" />
           </template>
@@ -419,9 +425,9 @@ watch(() => formUser.value, () => {
         </ElButton>
       </div>
       <DataTable
-        :columns="columns" :data-list="dataList" :loading="loading" :operate="true" :pagination="pagination"
-        @delete="dalete" @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
-        @selection-change="handleSelectionChange"
+        :auth="auths" :columns="columns" :data-list="dataList" :loading="loading"
+        :operate="auths.delete || auths.edit" :pagination="pagination" @delete="dalete" @edit="handleEdit"
+        @current-change="handleCurrentChange" @size-change="handleSizeChange" @selection-change="handleSelectionChange"
       >
         <template #is_active="{ date }">
           <!-- {{ date }} -->

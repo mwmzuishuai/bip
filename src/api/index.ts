@@ -90,8 +90,6 @@ api.interceptors.response.use(
 
     // 判断是否超过重试次数
     if (config.retryCount >= MAX_RETRY_COUNT) {
-      console.log(2)
-
       return handleError(error)
     }
 

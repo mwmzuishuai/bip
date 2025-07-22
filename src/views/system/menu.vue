@@ -3,7 +3,13 @@ import { ElMessageBox } from 'element-plus'
 import { toast } from 'vue-sonner'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
+import useAuth from '@/utils/composables/useAuth'
 
+const { auth } = useAuth()
+const auths = ref({
+  delete: auth('sys:menu:delete'),
+  edit: auth('sys:menu:edit'),
+})
 const stytemStore = useStystemStore()
 const { getMenus } = stytemStore
 const { menus, menusTree } = storeToRefs(stytemStore)
@@ -241,7 +247,7 @@ onMounted(() => {
 
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
       <div class="m-b-4 flex">
-        <ElButton type="primary" @click="addMenu">
+        <ElButton v-auth="['sys:menu:add']" type="primary" @click="addMenu">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>
@@ -255,8 +261,8 @@ onMounted(() => {
         </ElButton>
       </div>
       <DataTable
-        :columns="columns" :data-list="menus" :default-expand-all="defaultExpandAll" :loading="loading"
-        :operate="true" row-key="id" @delete="handleDelete" @edit="handleEdit"
+        :auth="auths" :columns="columns" :data-list="menus" :default-expand-all="defaultExpandAll" :loading="loading" :operate="auths.delete || auths.edit"
+        row-key="id" @delete="handleDelete" @edit="handleEdit"
       >
         <template #status="{ date }">
           <!-- {{ date }} -->

@@ -9,6 +9,7 @@ meta:
 import LoginForm from '@/components/AccountForm/LoginForm.vue'
 import RegisterForm from '@/components/AccountForm/RegisterForm.vue'
 import ResetPasswordForm from '@/components/AccountForm/ResetPasswordForm.vue'
+import SelectCompany from '@/components/AccountForm/SelectCompany.vue'
 import ColorScheme from '@/layouts/components/Topbar/Toolbar/ColorScheme/index.vue'
 import useSettingsStore from '@/store/modules/settings'
 
@@ -23,7 +24,14 @@ const settingsStore = useSettingsStore()
 const redirect = ref(route.query.redirect?.toString() ?? settingsStore.settings.home.fullPath)
 const account = ref<string>()
 // 表单类型
-const formType = ref<'login' | 'register' | 'resetPassword'>('login')
+const formType = ref<'login' | 'register' | 'resetPassword' | 'selectC'>('login')
+function onLogin() {
+  router.push(redirect.value || '/')
+}
+function onCompany() {
+  formType.value = 'selectC'
+  console.log(formType.value)
+}
 </script>
 
 <template>
@@ -41,9 +49,10 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
         <LoginForm
           v-if="formType === 'login'"
           :account
-          @on-login="router.push(redirect)"
+          @on-login="onLogin"
           @on-register="(val) => { formType = 'register'; account = val }"
           @on-reset-password="(val) => { formType = 'resetPassword'; account = val }"
+          @on-company="onCompany"
         />
         <RegisterForm
           v-else-if="formType === 'register'"
@@ -56,6 +65,10 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
           :account
           @on-reset-password="(val) => { formType = 'login'; account = val }"
           @on-login="formType = 'login'"
+        />
+        <SelectCompany
+          v-else-if="formType === 'selectC'"
+          @on-login="onLogin"
         />
       </Transition>
     </div>
@@ -149,6 +162,7 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
       top: 50%;
       width: 100%;
       transform: translateY(-50%);
+
     }
   }
 

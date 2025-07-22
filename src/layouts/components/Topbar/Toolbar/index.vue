@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import LeftSide from './leftSide.vue'
 import RightSide from './rightSide.vue'
 

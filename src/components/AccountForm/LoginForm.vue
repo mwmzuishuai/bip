@@ -19,6 +19,7 @@ const emits = defineEmits<{
   onLogin: [account?: string]
   onRegister: [account?: string]
   onResetPassword: [account?: string]
+  onCompany: [account?: string]
 }>()
 
 const userStore = useUserStore()
@@ -52,7 +53,7 @@ const onSubmit = form.handleSubmit((values) => {
     else {
       localStorage.removeItem('login_account')
     }
-    emits('onLogin', values.username)
+    emits('onCompany', values.username)
   }).finally(() => {
     loading.value = false
   }).catch(() => {

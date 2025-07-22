@@ -1,7 +1,8 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useSlots } from '@/slots'
 import useSettingsStore from '@/store/modules/settings'
 import ColorScheme from './ColorScheme/index.vue'
+import CompanySelection from './CompanySelection/index.vue'
 import Fullscreen from './Fullscreen/index.vue'
 import NavSearch from './NavSearch/index.vue'
 import PageReload from './PageReload/index.vue'
@@ -15,6 +16,7 @@ const settingsStore = useSettingsStore()
 
 <template>
   <div class="flex items-center">
+    <CompanySelection />
     <NavSearch v-if="settingsStore.settings.toolbar.navSearch" />
     <Fullscreen v-if="settingsStore.settings.toolbar.fullscreen" />
     <PageReload v-if="settingsStore.settings.toolbar.pageReload" />
