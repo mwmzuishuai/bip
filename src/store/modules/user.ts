@@ -28,7 +28,7 @@ const useUserStore = defineStore(
     // 登录
     async function login(data: any) {
       const res = await apiUser.login(data)
-      localStorage.setItem('token', res.data.access_token)
+      localStorage.setItem('token', res.data.login_token)
       token.value = res.data.login_token
       // const info = await apiUser.getInfo()
       // account.value = info.data.nickname || '小小'
@@ -37,8 +37,11 @@ const useUserStore = defineStore(
       // localStorage.setItem('avatar', info.data.avatar)
     }
     // 选择公司
-    async function selectCompany(data: any) {
-      console.log(2222)
+    async function selectCompany(id: any) {
+      const res = await apiUser.getPermission(id)
+      localStorage.setItem('token', res.data.access_token)
+      token.value = res.data.access_token
+      localStorage.setItem('companyId', id)
     }
     // 获取公司列表
     async function getCompanyList() {

@@ -4,9 +4,16 @@ import useUserStore from '@/store/modules/user'
 const userStore = useUserStore()
 const value = ref(1)
 const { companyList } = storeToRefs(userStore)
-function companyChage(val) {
-  console.log(val)
+async function companyChage(val) {
+  await userStore.selectCompany(val)
+  value.value = val
+  // 刷新页面
+  window.location.reload()
 }
+onMounted(() => {
+  userStore.getCompanyList()
+  value.value = JSON.parse(localStorage.getItem('companyId'))
+})
 </script>
 
 <template>

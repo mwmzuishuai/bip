@@ -5,6 +5,7 @@ import { setupLayouts } from 'virtual:meta-layouts'
 import useSettingsStore from '@/store/modules/settings'
 import Logs from './modules/log'
 import MultilevelMenuExample from './modules/system'
+import Tenant from './modules/tenant'
 
 // 固定路由（默认路由）
 const constantRoutes: RouteRecordRaw[] = [
@@ -71,6 +72,7 @@ const asyncRoutes: Route.recordMainRaw[] = [
     children: [
       MultilevelMenuExample,
       Logs,
+      Tenant,
     ],
   },
   // {

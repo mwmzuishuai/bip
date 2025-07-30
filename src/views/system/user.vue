@@ -274,8 +274,8 @@ function getUserInfos(id) {
       phone: res.data.phone,
       avatar: res.data.avatar,
       is_active: res.data.is_active,
-      dept_id: res.data.dept_id,
-      roles: res.data.roles.map(r => r.id),
+      dept_ids: res.data.depts.map(i => i.id),
+      role_ids: res.data.roles.map(r => r.id),
     }
   })
 }
@@ -286,7 +286,9 @@ async function putUserInfos(formEl) {
   await formEl.validate((valid) => {
     if (valid) {
       if (titleDrawer.value === '编辑用户') {
-        api.patchUserInfo(drwawerForm.value.id, drwawerForm.value).then(() => {
+        const obj = drwawerForm.value
+        delete obj.roles
+        api.patchUserInfo(drwawerForm.value.id, obj).then(() => {
           toast.success('修改成功')
           dtawerKey.value = false
           getUserList()
@@ -467,7 +469,7 @@ watch(() => formUser.value, () => {
               <ElCol :span="12">
                 <ElFormItem label="归属部门" prop="dept_id">
                   <ElTreeSelect
-                    v-model="drwawerForm.dept_id" :data="deptsTreeTvalue" check-strictly clearable
+                    v-model="drwawerForm.dept_ids" :data="deptsTreeTvalue" clearable filterable multiple
                     placeholder="请选择"
                   />
                 </ElFormItem>

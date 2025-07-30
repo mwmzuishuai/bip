@@ -8,14 +8,14 @@ const emits = defineEmits<{
 }>()
 const userStore = useUserStore()
 const { companyList } = storeToRefs(userStore)
-async function selectCompanys() {
-  userStore.selectCompany()
+async function selectCompanys(item: any) {
+  await userStore.selectCompany(item.id)
   emits('onLogin')
 }
 onMounted(async () => {
   await userStore.getCompanyList()
-  if (companyList.value.length < 2) {
-    userStore.selectCompany().then((res) => {
+  if (companyList.value.length < 2 && companyList.value.length > 0) {
+    userStore.selectCompany(companyList.value[0]).then(() => {
       emits('onLogin')
     })
   }
@@ -30,7 +30,7 @@ onMounted(async () => {
       </h3>
     </div>
     <ul class="ul mb-6 h-300px">
-      <li v-for="item in companyList" :key="item" class="list h-40px flex items-center justify-between" @dblclick="selectCompanys(item)">
+      <li v-for="item in companyList" :key="item" class="list h-40px flex items-center justify-between" @click="selectCompanys(item)">
         {{ item.name }}
       </li>
     </ul>

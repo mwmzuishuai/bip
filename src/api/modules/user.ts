@@ -16,6 +16,12 @@ export default {
   getInfo: () => api.get('/sys/users/current'),
   // 获取公司列表
   getCompanyList: () => api.get('/sys/users/current/tenants'),
+  // 认证权限
+  getPermission: (id: any) => api.get('/auth/tokens', {
+    params: {
+      tenant_id: id,
+    },
+  }),
   // 修改密码
   passwordEdit: (data: {
     password: string
