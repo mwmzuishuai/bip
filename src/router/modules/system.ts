@@ -26,7 +26,7 @@ const routes: RouteRecordRaw = {
     },
     {
       path: 'menu',
-      name: 'menu',
+      name: 'menus',
       component: () => import('@/views/system/menu.vue'),
       meta: {
         title: '菜单管理',
@@ -37,7 +37,7 @@ const routes: RouteRecordRaw = {
     {
       path: 'interface',
       name: 'interface',
-      component: () => import('@/views/system/api.vue'),
+      component: () => import('@/views/system/menu.vue'),
       meta: {
         title: '接口管理',
         icon: 'material-symbols:api',

@@ -12,7 +12,7 @@ export default {
   // 删除用户
   deleteUser: (id: string) => api.delete(`/sys/users/${id}`),
   // 获取所有部门树架构
-  getTreeDepts: () => api.get('/sys/depts/tree'),
+  getTreeDepts: (data: any) => api.get('/sys/depts/tree', { params: { ...data } }),
   // 获取部门列表
   getDeptList: () => api.get('/sys/depts'),
   // 添加部门
@@ -37,6 +37,8 @@ export default {
   patchRoleInfo: (id: number, data: any) => api.patch(`/sys/roles/${id}`, data),
   // 新增角色信息
   postRoleInfo: (data: any) => api.post(`/sys/roles`, data),
+  // 删除角色信息
+  deleteRole: (id: number) => api.delete(`/sys/roles/${id}`),
   // 获取角色信息的详细数据
   getRoleInfo: (id: number) => api.get(`/sys/roles/${id}`),
 

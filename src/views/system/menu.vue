@@ -134,7 +134,6 @@ function addMenu() {
   menuTitle.value = '新增菜单'
   menukey.value = true
   addForm.value = {
-    title: '',
     parent_id: null, // 初始化 parent_id 为 null
     type: 0,
     permission_code: '',

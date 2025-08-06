@@ -6,8 +6,8 @@ const useStystemStore = defineStore('system', () => {
   const deptsTreeTvalue = ref([])
   const menus = ref([])
   const menusTree = ref([])
-  async function getDepts() {
-    const res = await api.getTreeDepts()
+  async function getDepts(data:any) {
+    const res = await api.getTreeDepts(data)
     depts.value = res.data.dept_tree
     // 递归处理树形结构
     function processTree(data: any[], type: number) {

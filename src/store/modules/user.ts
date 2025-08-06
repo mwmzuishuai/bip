@@ -28,13 +28,13 @@ const useUserStore = defineStore(
     // 登录
     async function login(data: any) {
       const res = await apiUser.login(data)
-      localStorage.setItem('token', res.data.login_token)
-      token.value = res.data.login_token
-      // const info = await apiUser.getInfo()
-      // account.value = info.data.nickname || '小小'
-      // avatar.value = info.data.avatar || ''
-      // localStorage.setItem('account', info.data.nickname)
-      // localStorage.setItem('avatar', info.data.avatar)
+      localStorage.setItem('token', res.data.access_token	)
+      token.value = res.data.access_token
+      const info = await apiUser.getInfo()
+      account.value = info.data.nickname || '小小'
+      avatar.value = info.data.avatar || ''
+      localStorage.setItem('account', info.data.nickname)
+      localStorage.setItem('avatar', info.data.avatar)
     }
     // 选择公司
     async function selectCompany(id: any) {

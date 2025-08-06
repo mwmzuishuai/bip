@@ -128,11 +128,6 @@ const pagination = ref({
 })
 const columns = ref([
   {
-    type: 'selection',
-    width: '50',
-    align: 'center',
-  },
-  {
     prop: 'username',
     label: '用户名称',
     width: '160',
@@ -158,10 +153,11 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop: 'dept_name',
+    prop: 'depts',
     label: '部门',
     width: '200',
     align: 'center',
+    render: true,
   },
   {
     prop: 'role_names',
@@ -189,10 +185,14 @@ const auths = ref({
   delete: auth('sys:user:delete'),
   edit: auth('sys:user:edit'),
 })
+const defaultProps = {
+  children: 'children',
+  label: 'label',
+}
 async function getUserList() {
   const form = { ...formUser.value }
-  if (form.create_time) {
-    form.create_time = form.create_time.join(',')
+  if (form.create_in) {
+    form.create_in = form.create_in.join(',')
   }
   loading.value = true
   await api.getUserList(form).then((res) => {
@@ -342,8 +342,15 @@ function handleSelectionChange(val) {
     return item.id
   })
 }
+//部门切换
+function handleNodeClick(data, node, component) {
+  formUser.value.page = 1
+  formUser.value.dept_id = data.value
+  searchList()
+}
 onMounted(() => {
   getUserList()
+  stytemStore.getDepts()
 })
 watch(() => formUser.value, () => {
 
@@ -353,210 +360,227 @@ watch(() => formUser.value, () => {
 </script>
 
 <template>
-  <div class="absolute-container">
-    <FaPageMain>
-      <FaSearchBar :show-toggle="false">
-        <template #default>
-          <ElForm :model="formUser" label-width="120px" size="default" @keydown.enter="searchList">
-            <ElRow>
-              <ElCol :span="6">
-                <ElFormItem label="用户名称">
-                  <ElInput v-model="formUser.username" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="6">
-                <ElFormItem label="手机号">
-                  <ElInput v-model="formUser.phone" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="6">
-                <ElFormItem label="状态">
-                  <ElSelect v-model="formUser.is_active" clearable placeholder="请选择">
-                    <ElOption :value="false" label="已禁用" />
-                    <ElOption :value="true" label="已启动" />
-                  </ElSelect>
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="6">
-                <ElFormItem label="创建日期">
-                  <el-date-picker
-                    v-model="formUser.create_time" end-placeholder="结束日期" placeholder="选择日期范围"
-                    range-separator="-" start-placeholder="开始日期" type="daterange" value-format="YYYY-MM-DD"
-                  />
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="6">
-                <ElFormItem label="部门" prop="parent_id">
-                  <ElTreeSelect
-                    v-model="formUser.dept_id" :data="deptsTreeTvalue" check-strictly clearable
-                    placeholder="请输入"
-                  />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElFormItem>
-                <ElButton type="primary" @click="searchList">
-                  <template #icon>
-                    <FaIcon name="i-ep:search" />
-                  </template>
-                  搜索
-                </ElButton>
-                <ElButton @click="reset">
-                  重置
-                </ElButton>
-              </ElFormItem>
-            </ElRow>
-          </ElForm>
-        </template>
-      </FaSearchBar>
+  <div class="box">
+    <FaPageMain class="left">
+      <ElTree :data="deptsTreeTvalue" :expand-on-click-node="false"  :props="defaultProps" default-expand-all  @node-click="handleNodeClick">
+      </ElTree>
     </FaPageMain>
-    <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
-      <div class="m-[20px] m-b-4 flex">
-        <ElButton v-auth="['sys:user:add']" type="primary" @click="postUserInfos()">
-          <template #icon>
-            <FaIcon name="i-ep:plus" />
+    <div class="absolute-container">
+      <FaPageMain>
+        <FaSearchBar :show-toggle="false">
+          <template #default>
+            <ElForm :model="formUser" label-width="120px" size="default" @keydown.enter="searchList">
+              <ElRow>
+                <ElCol :span="6">
+                  <ElFormItem label="用户名称">
+                    <ElInput v-model="formUser.username" clearable placeholder="请输入" />
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="6">
+                  <ElFormItem label="手机号">
+                    <ElInput v-model="formUser.phone" clearable placeholder="请输入" />
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="6">
+                  <ElFormItem label="状态">
+                    <ElSelect v-model="formUser.is_active" clearable placeholder="请选择">
+                      <ElOption :value="false" label="已禁用" />
+                      <ElOption :value="true" label="已启动" />
+                    </ElSelect>
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="6">
+                  <ElFormItem label="创建日期">
+                    <el-date-picker
+                      v-model="formUser.create_in" end-placeholder="结束日期" placeholder="选择日期范围"
+                      range-separator="-" start-placeholder="开始日期" type="daterange" value-format="YYYY-MM-DD"
+                    />
+                  </ElFormItem>
+                </ElCol>
+<!--                <ElCol :span="6">-->
+<!--                  <ElFormItem label="部门" prop="parent_id">-->
+<!--                    <ElTreeSelect-->
+<!--                      v-model="formUser.dept_id" :data="deptsTreeTvalue" check-strictly clearable-->
+<!--                      placeholder="请输入"-->
+<!--                    />-->
+<!--                  </ElFormItem>-->
+<!--                </ElCol>-->
+              </ElRow>
+              <ElRow>
+                <ElFormItem >
+                  <ElButton type="primary" @click="searchList">
+                    <template #icon>
+                      <FaIcon name="i-ep:search" />
+                    </template>
+                    搜索
+                  </ElButton>
+                  <ElButton @click="reset">
+                    重置
+                  </ElButton>
+                </ElFormItem>
+              </ElRow>
+            </ElForm>
           </template>
-          新增
-        </ElButton>
-        <ElButton v-auth="['sys:user:delete']" type="danger" @click="dalete()">
-          <template #icon>
-            <FaIcon name="i-ep:Delete" />
+        </FaSearchBar>
+      </FaPageMain>
+      <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
+        <div class="m-[20px] m-b-4 flex">
+          <ElButton v-auth="['sys:user:add']" type="primary" @click="postUserInfos()">
+            <template #icon>
+              <FaIcon name="i-ep:plus" />
+            </template>
+            新增
+          </ElButton>
+          <ElButton v-auth="['sys:user:delete']" type="danger" @click="dalete()">
+            <template #icon>
+              <FaIcon name="i-ep:Delete" />
+            </template>
+            删除
+          </ElButton>
+        </div>
+        <DataTable
+          :auth="auths" :columns="columns" :data-list="dataList" :loading="loading"
+          :operate="auths.delete || auths.edit" :pagination="pagination" @delete="dalete" @edit="handleEdit"
+          @current-change="handleCurrentChange" @size-change="handleSizeChange" @selection-change="handleSelectionChange"
+        >
+          <template #is_active="{ date }">
+            <!-- {{ date }} -->
+            <ElSwitch
+              v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+              inline-prompt size="large" @change="handleSwitchChange(date)"
+            />
           </template>
-          删除
-        </ElButton>
-      </div>
-      <DataTable
-        :auth="auths" :columns="columns" :data-list="dataList" :loading="loading"
-        :operate="auths.delete || auths.edit" :pagination="pagination" @delete="dalete" @edit="handleEdit"
-        @current-change="handleCurrentChange" @size-change="handleSizeChange" @selection-change="handleSelectionChange"
-      >
-        <template #is_active="{ date }">
-          <!-- {{ date }} -->
-          <ElSwitch
-            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
-            inline-prompt size="large" @change="handleSwitchChange(date)"
-          />
-        </template>
-        <template #gender="{ date }">
-          {{ date.gender === 1 ? '男' : '女' }}
-        </template>
-        <template #dept_id="{ date }">
-          {{ deptList.value?.find((item) => item.id === date.dept_id)?.name }}
-        </template>
-        <template #role_names="{ date }">
-          <div class="flex flex-col justify-center" style=" align-items: center;">
-            <el-tag
-              v-for="item in date.role_names" :key="item" style=" max-width: 50%;margin: 10px 0;"
-              type="success"
-            >
-              {{ item }}
-            </el-tag>
-          </div>
-        </template>
-      </DataTable>
-    </FaPageMain>
-    <ElDrawer v-model="dtawerKey" :title="titleDrawer" size="40%">
-      <FaSearchBar :show-toggle="false">
-        <template #default>
-          <ElForm ref="addFormRef" :model="drwawerForm" :rules="addRules" label-width="120px" size="default">
-            <ElRow>
-              <ElCol v-if="titleDrawer === '新增用户'" :span="12">
-                <ElFormItem label="用户名称" prop="username">
-                  <ElInput v-model="drwawerForm.username" clearable placeholder="请输入" />
+          <template #gender="{ date }">
+            {{ date.gender === 1 ? '男' : '女' }}
+          </template>
+          <template #depts="{ date }">
+           <div v-for="item in date.depts" :key="item.id">{{ item.name }}</div>
+          </template>
+          <template #role_names="{ date }">
+            <div class="flex flex-col justify-center" style=" align-items: center;">
+              <el-tag
+                v-for="item in date.role_names" :key="item" style=" max-width: 50%;margin: 10px 0;"
+                type="success"
+              >
+                {{ item }}
+              </el-tag>
+            </div>
+          </template>
+        </DataTable>
+      </FaPageMain>
+      <ElDrawer v-model="dtawerKey" :title="titleDrawer" size="40%">
+        <FaSearchBar :show-toggle="false">
+          <template #default>
+            <ElForm ref="addFormRef" :model="drwawerForm" :rules="addRules" label-width="120px" size="default">
+              <ElRow>
+                <ElCol v-if="titleDrawer === '新增用户'" :span="12">
+                  <ElFormItem label="用户名称" prop="username">
+                    <ElInput v-model="drwawerForm.username" clearable placeholder="请输入" />
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="12">
+                  <ElFormItem label="归属部门" prop="dept_id">
+                    <ElTreeSelect
+                      v-model="drwawerForm.dept_ids" :data="deptsTreeTvalue"  check-strictly clearable filterable multiple
+                      placeholder="请选择"
+                    />
+                  </ElFormItem>
+                </ElCol>
+              </ElRow>
+              <ElRow>
+                <ElCol :span="12">
+                  <ElFormItem label="手机号码" prop="phone">
+                    <ElInput v-model="drwawerForm.phone" clearable placeholder="请输入" />
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="12">
+                  <ElFormItem label="邮箱" prop="email">
+                    <ElInput v-model="drwawerForm.email" clearable placeholder="请输入" />
+                  </ElFormItem>
+                </ElCol>
+              </ElRow>
+              <ElRow>
+                <ElCol :span="12">
+                  <ElFormItem label="用户性别" prop="gender">
+                    <ElRadioGroup v-model="drwawerForm.gender">
+                      <ElRadio :value="1">
+                        男
+                      </ElRadio>
+                      <ElRadio :value="2">
+                        女
+                      </ElRadio>
+                    </ElRadioGroup>
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="12">
+                  <ElFormItem label="状态" prop="is_active">
+                    <ElRadioGroup v-model="drwawerForm.is_active">
+                      <ElRadio :value="true">
+                        启用
+                      </ElRadio>
+                      <ElRadio :value="false">
+                        禁用
+                      </ElRadio>
+                    </ElRadioGroup>
+                  </ElFormItem>
+                </ElCol>
+              </ElRow>
+              <ElRow>
+                <ElCol :span="12">
+                  <ElFormItem label="角色" prop="role_ids">
+                    <ElSelect v-model="drwawerForm.role_ids" clearable filterable multiple placeholder="请选择">
+                      <ElOption v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
+                    </ElSelect>
+                  </ElFormItem>
+                </ElCol>
+                <ElCol :span="12">
+                  <ElFormItem label="昵称" prop="nickname">
+                    <ElInput v-model="drwawerForm.nickname" clearable placeholder="请输入" />
+                  </ElFormItem>
+                </ElCol>
+              </ElRow>
+              <ElRow>
+                <ElCol v-if="titleDrawer === '新增用户'" :span="12">
+                  <ElFormItem label="密码" prop="password">
+                    <ElInput v-model="drwawerForm.password" clearable placeholder="请输入" type="password" />
+                  </ElFormItem>
+                </ElCol>
+              </ElRow>
+              <ElRow>
+                <ElFormItem>
+                  <ElButton type="primary" @click="putUserInfos(addFormRef)">
+                    确定
+                  </ElButton>
+                  <ElButton @click="dtawerKey = false">
+                    取消
+                  </ElButton>
                 </ElFormItem>
-              </ElCol>
-              <ElCol :span="12">
-                <ElFormItem label="归属部门" prop="dept_id">
-                  <ElTreeSelect
-                    v-model="drwawerForm.dept_ids" :data="deptsTreeTvalue" clearable filterable multiple
-                    placeholder="请选择"
-                  />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElCol :span="12">
-                <ElFormItem label="手机号码" prop="phone">
-                  <ElInput v-model="drwawerForm.phone" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="12">
-                <ElFormItem label="邮箱" prop="email">
-                  <ElInput v-model="drwawerForm.email" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElCol :span="12">
-                <ElFormItem label="用户性别" prop="gender">
-                  <ElRadioGroup v-model="drwawerForm.gender">
-                    <ElRadio :value="1">
-                      男
-                    </ElRadio>
-                    <ElRadio :value="2">
-                      女
-                    </ElRadio>
-                  </ElRadioGroup>
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="12">
-                <ElFormItem label="状态" prop="is_active">
-                  <ElRadioGroup v-model="drwawerForm.is_active">
-                    <ElRadio :value="true">
-                      启用
-                    </ElRadio>
-                    <ElRadio :value="false">
-                      禁用
-                    </ElRadio>
-                  </ElRadioGroup>
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElCol :span="12">
-                <ElFormItem label="角色" prop="role_ids">
-                  <ElSelect v-model="drwawerForm.role_ids" clearable filterable multiple placeholder="请选择">
-                    <ElOption v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
-                  </ElSelect>
-                </ElFormItem>
-              </ElCol>
-              <ElCol :span="12">
-                <ElFormItem label="昵称" prop="nickname">
-                  <ElInput v-model="drwawerForm.nickname" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElCol v-if="titleDrawer === '新增用户'" :span="12">
-                <ElFormItem label="密码" prop="password">
-                  <ElInput v-model="drwawerForm.password" clearable placeholder="请输入" type="password" />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElFormItem>
-                <ElButton type="primary" @click="putUserInfos(addFormRef)">
-                  确定
-                </ElButton>
-                <ElButton @click="dtawerKey = false">
-                  取消
-                </ElButton>
-              </ElFormItem>
-            </ElRow>
-          </ElForm>
-        </template>
-      </FaSearchBar>
-    </ElDrawer>
+              </ElRow>
+            </ElForm>
+          </template>
+        </FaSearchBar>
+      </ElDrawer>
+    </div>
   </div>
+
 </template>
 
 <style scoped>
-.absolute-container {
+.box{
   position: absolute;
   display: flex;
-  flex-direction: column;
   width: 100%;
+  height: 100%;
+}
+.left{
+  width: 20%;
+  //height: 100%;
+}
+.absolute-container {
+  //position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 80%;
   height: 100%;
 }
 

@@ -53,7 +53,7 @@ const onSubmit = form.handleSubmit((values) => {
     else {
       localStorage.removeItem('login_account')
     }
-    emits('onCompany', values.username)
+    emits('onLogin', values.username)
   }).finally(() => {
     loading.value = false
   }).catch(() => {

@@ -35,6 +35,13 @@ const columns = ref([
     align: 'center',
   },
   {
+    prop: 'is_active',
+    label: '状态',
+    width: '200',
+    align: 'center',
+    render:true
+  },
+  {
     prop: 'phone',
     label: '联系电话',
     width: '200',
@@ -90,6 +97,9 @@ const rules = reactive({
       trigger: 'blur',
     },
   ],
+  is_active: [
+    { required: true, message: '请选择状态', trigger: 'change' },
+  ],
 })
 // 展开折叠
 const defaultExpandAll = ref(true)
@@ -113,7 +123,7 @@ function handleEdit(row) {
 // 删除部门
 async function handleDelete(row) {
   try {
-    await ElMessageBox.confirm('是否确认删除?', '删除用户', {
+    await ElMessageBox.confirm('是否确认删除（删除部门会同时删除部门下的所有子部门）?', '删除部门', {
       confirmButtonText: '确认',
       cancelButtonText: '取消',
       type: 'error',
@@ -137,8 +147,14 @@ async function handleDelete(row) {
   }
 }
 function search() {
+  getDepts(deptForm.value)
 }
+function resetForm() {
+  deptForm.value = {
 
+  }
+  getDepts()
+}
 // 保存
 async function saveDeptPermissions(formEl) {
   if (!formEl) {
@@ -177,14 +193,14 @@ onMounted(() => {
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="部门名称" prop="deptName">
-                  <ElInput v-model="deptForm.deptName" clearable placeholder="请输入" />
+                  <ElInput v-model="deptForm.name" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="状态" prop="status">
-                  <ElSelect v-model="deptForm.status" clearable placeholder="请选择">
-                    <ElOption :value="1" label="正常" />
-                    <ElOption :value="2" label="停用" />
+                  <ElSelect v-model="deptForm.is_active" clearable placeholder="请选择">
+                    <ElOption :value="true" label="正常" />
+                    <ElOption :value="false" label="停用" />
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
@@ -196,7 +212,7 @@ onMounted(() => {
                   </template>
                   搜索
                 </ElButton>
-                <ElButton>重置</ElButton>
+                <ElButton @click="resetForm">重置</ElButton>
               </ElFormItem>
             </ElRow>
           </ElForm>
@@ -222,9 +238,9 @@ onMounted(() => {
         :auth="auths" :columns="columns" :data-list="depts" :default-expand-all="defaultExpandAll" :operate="auths.delete || auths.edit"
         row-key="id" @delete="handleDelete" @edit="handleEdit"
       >
-        <template #status="{ date }">
+        <template #is_active="{ date }">
           <!-- {{ date }} -->
-          <ElTag v-if="date.status === 1" type="success">
+          <ElTag v-if="date.is_active" type="success">
             正常
           </ElTag>
           <ElTag v-else type="danger">
@@ -262,6 +278,18 @@ onMounted(() => {
                 v-model="deptForm.parent_id" :data="deptsTreeTvalue" check-strictly clearable
                 placeholder="请选择"
               />
+            </ElFormItem>
+          </ElCol>
+          <ElCol :span="12">
+            <ElFormItem label="状态" prop="is_active">
+              <ElRadioGroup v-model="deptForm.is_active" clearable placeholder="请选择">
+                <ElRadio :value="true">
+                  启用
+                </ElRadio>
+                <ElRadio :value="false">
+                  禁止
+                </ElRadio>
+              </ElRadioGroup>
             </ElFormItem>
           </ElCol>
         </ElRow>

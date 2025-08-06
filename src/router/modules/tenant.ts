@@ -19,7 +19,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '租户管理',
         icon: 'i-ant-design:UserSwitchOutlined',
-
+        // auth: ['sys:manage'],
       },
     },
     {

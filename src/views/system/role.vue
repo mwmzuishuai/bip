@@ -32,11 +32,6 @@ const roleDrawerKey = ref(false)
 const treeKey = ref(true)
 const columns = ref([
   {
-    type: 'selection',
-    width: '50',
-    align: 'center',
-  },
-  {
     prop: 'name',
     label: '角色名称',
     width: '180',
@@ -97,14 +92,36 @@ async function handleEdit(row) {
   roleTitle.value = '编辑角色'
   await nextTick()
   if (treeRef.value) {
-    console.log(selectedMenuIds.value)
 
     treeRef.value.setCheckedKeys(selectedMenuIds.value)
   }
 }
 
-function handleDelete(row) {
-  console.log(row)
+async function handleDelete(val) {
+  try {
+    await ElMessageBox.confirm('是否确认删除?', '删除角色', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'error',
+    })
+
+    const id = val ? val.id : delectList.value.join(',')
+
+    // 等待删除操作完成
+    await api.deleteRole(id)
+
+    // 显示成功提示
+    toast.success('删除成功')
+
+    // 刷新用户列表
+    await getRolelist()
+  }
+  catch (error) {
+    // 错误处理（用户取消删除或API请求失败）
+    // if (error !== 'cancel' && error !== 'close') {
+      toast.error('删除失败')
+    // }
+  }
 }
 const addRules = reactive({
   name: [
@@ -157,6 +174,8 @@ function addRole() {
   roleTitle.value = '添加角色'
   roleDrawerKey.value = true
   patchForm.value = {}
+  selectedMenuIds.value =[]
+  treeRef.value.setCheckedKeys(selectedMenuIds.value)
 }
 // 获取角色列表
 function getRolelist() {
@@ -198,6 +217,8 @@ async function saveRolePermissions(formEl) {
 }
 onMounted(() => {
   getRolelist()
+  stystemStore.getMenus()
+
 })
 </script>
 

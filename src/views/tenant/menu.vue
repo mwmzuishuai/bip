@@ -1,8 +1,22 @@
 <script setup>
 import { ref } from 'vue'
 import useAuth from '@/utils/composables/useAuth'
-
+import api from '@/api/modules/tenant.js'
 const { auth } = useAuth()
+const treeKey = ref(true)
+import useStystemStore from '@/store/modules/system'
+const stystemStore = useStystemStore()
+const { menusTree } = storeToRefs(stystemStore)
+import { toast } from 'vue-sonner'
+import {ElMessageBox} from "element-plus";
+const treeRef = ref(null)
+const options = [{
+  label: '父子联动',
+  value: false,
+}, {
+  label: '非父子联动',
+  value: true,
+}]
 const formMenu = ref({
   page: 1,
   size: 10,
@@ -13,7 +27,7 @@ const auths = ref({
 })
 const columns = ref([
   {
-    prop: 'menu_name',
+    prop: 'name',
     label: '套餐名称',
     width: '160',
     align: 'center',
@@ -25,17 +39,23 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop: 'package_description',
+    prop: 'remark',
     label: '套餐描述',
     width: '100',
     align: 'center',
-    render: true,
   },
   {
-    prop: 'last_modify_time',
+    prop: 'update_time',
     label: '最近修改',
     align: 'center',
   },
+  {
+    prop:'is_active',
+    label:'状态',
+    align:'center',
+    render: true,
+  }
+  ,
   {
     prop: 'create_time',
     label: '创建时间',
@@ -50,7 +70,7 @@ const pagination = ref({
 const dtawerKey = ref(false)
 const titleDrawer = ref('新增租户')
 const addFormRef = ref(null)
-const drwawerForm = ref()
+const drwawerForm = ref({})
 const addRules = ref({
   tenant_name: [{ required: true, message: '请输入租户名称', trigger: ['blur'] }],
   tenant_code: [{ required: true, message: '请输入租户编码', trigger: ['blur'] }],
@@ -61,21 +81,29 @@ const dataList = ref([
 ])
 // 搜索
 function getTenantList() {
-
+  getPackage()
 }
 // 重置
 function reset() {
   formMenu.value = {
-
+    page: 1,
+    size: 10,
   }
 }
 // 删除
 function dalete() {}
 // 编辑
-function handleEdit() {
-
+async function handleEdit(item) {
+  dtawerKey.value = true
+  titleDrawer.value = '编辑套餐'
+  const res = await api.getPackageDetail(item.id)
+  drwawerForm.value = res.data
+  console.log(res.data.menus)
+  if (treeRef.value) {
+    treeRef.value.setCheckedKeys(res.data.menus.map(item=>item.id))
+  }
 }
-// 新增
+// 新增点击
 function postUserInfos() {
   dtawerKey.value = true
   titleDrawer.value = '新增套餐'
@@ -92,6 +120,57 @@ function handleCurrentChange(val) {
 function handleSizeChange(val) {
   formMenu.value.size = val
 }
+//获取套餐列表
+function getPackage() {
+  api.getPackageList(formMenu.value).then((res) => {
+    dataList.value = res.data.items
+    pagination.value.total = res.data.total
+  })
+}
+//提交
+async function putUserInfos(formEl) {
+  if (!formEl) { return }
+  await formEl.validate((valid) => {
+    if (valid) {
+      if (titleDrawer.value === '编辑套餐'){
+        const obj = {
+          is_active:drwawerForm.value.is_active,
+          name:drwawerForm.value.name,
+          remark:drwawerForm.value.remark,
+          menu_ids: [...treeRef.value.getHalfCheckedKeys(), ...treeRef.value.getCheckedKeys()],
+        }
+        api.patchPackage(drwawerForm.value.id,obj).then(() => {
+          toast.success('修改成功')
+          dtawerKey.value = false
+          getPackage()
+        })
+      }
+
+    }
+  })
+}
+//状态修改
+function handleSwitchChange(item) {
+  api.patchPackage(item.id, { is_active: item.is_active }).then(() => {
+    toast.success('修改成功')
+    getPackage()
+  })
+}
+function handleBeforeSwitchChange() {
+  return new Promise((resolve) => {
+    ElMessageBox.confirm('是否确定修改该状态?', '修改状态', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'error',
+    }).then(() => {
+      return resolve(true)
+    })
+  })
+}
+onMounted(()=>{
+  getPackage()
+  stystemStore.getMenus()
+})
 </script>
 
 <template>
@@ -103,12 +182,15 @@ function handleSizeChange(val) {
             <ElRow>
               <ElCol :span="6">
                 <ElFormItem label="套餐名称">
-                  <ElInput v-model="formMenu.username" clearable placeholder="请输入" />
+                  <ElInput v-model="formMenu.name" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="6">
-                <ElFormItem label="租户编码">
-                  <ElInput v-model="formMenu.phone" clearable placeholder="请输入" />
+                <ElFormItem label="状态">
+                  <ElSelect v-model="formMenu.is_active" clearable placeholder="请输入">
+                    <ElOption label="已启动" value="1" />
+                    <ElOption label="已禁止" value="0" />
+                  </ElSelect>
                 </ElFormItem>
               </ElCol>
             </ElRow>
@@ -142,42 +224,29 @@ function handleSizeChange(val) {
         :auth="auths" :columns="columns" :data-list="dataList" :loading="loading"
         :operate="auths.delete || auths.edit" :pagination="pagination" @delete="dalete" @edit="handleEdit"
         @current-change="handleCurrentChange" @size-change="handleSizeChange"
-      />
+      >
+        <template #is_active="{ date }">
+          <!-- {{ date }} -->
+          <ElSwitch
+            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            inline-prompt size="large" @change="handleSwitchChange(date)"
+          />
+        </template>
+      </DataTable>
     </FaPageMain>
     <ElDrawer v-model="dtawerKey" :title="titleDrawer" size="40%">
       <FaSearchBar :show-toggle="false">
         <template #default>
           <ElForm ref="addFormRef" :model="drwawerForm" :rules="addRules" label-width="120px" size="default">
             <ElRow>
-              <ElCol v-if="titleDrawer === '新增用户'" :span="12">
-                <ElFormItem label="用户名称" prop="username">
-                  <ElInput v-model="drwawerForm.username" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
               <ElCol :span="12">
-                <ElFormItem label="手机号码" prop="phone">
-                  <ElInput v-model="drwawerForm.phone" clearable placeholder="请输入" />
+                <ElFormItem label="套餐名称" prop="name">
+                  <ElInput v-model="drwawerForm.name" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="12">
-                <ElFormItem label="邮箱" prop="email">
-                  <ElInput v-model="drwawerForm.email" clearable placeholder="请输入" />
-                </ElFormItem>
-              </ElCol>
-            </ElRow>
-            <ElRow>
-              <ElCol :span="12">
-                <ElFormItem label="用户性别" prop="gender">
-                  <ElRadioGroup v-model="drwawerForm.gender">
-                    <ElRadio :value="1">
-                      男
-                    </ElRadio>
-                    <ElRadio :value="2">
-                      女
-                    </ElRadio>
-                  </ElRadioGroup>
+                <ElFormItem label="套餐描述" prop="remark">
+                  <ElInput v-model="drwawerForm.remark" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
               <ElCol :span="12">
@@ -193,6 +262,10 @@ function handleSizeChange(val) {
                 </ElFormItem>
               </ElCol>
             </ElRow>
+            <div style="margin-top: 10px;margin-bottom: 10px;">
+              <ElSegmented v-model="treeKey" :options="options" size="large" />
+            </div>
+            <ElTree ref="treeRef" :check-strictly="treeKey" :data="menusTree" node-key="id" show-checkbox />
             <ElRow>
               <ElFormItem>
                 <ElButton type="primary" @click="putUserInfos(addFormRef)">
@@ -217,5 +290,9 @@ function handleSizeChange(val) {
   flex-direction: column;
   width: 100%;
   height: 100%;
+}
+.switch-container {
+  --el-switch-on-color: #1b9cfc;
+  --el-switch-off-color: #ff4949;
 }
 </style>
