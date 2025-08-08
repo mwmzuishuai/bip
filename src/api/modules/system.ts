@@ -35,6 +35,12 @@ export default {
   getRolelist: (data: any) => api.get('/sys/roles', { params: { ...data } }),
   // 修改角色信息
   patchRoleInfo: (id: number, data: any) => api.patch(`/sys/roles/${id}`, data),
+  //获取角色用户列表
+  getRoleUsers: (id: number, data: any) => api.get(`/sys/roles/${id}/users`, { params: { ...data } }),
+  //新增角色用户
+  postRoleUsers: (role_id: number, user_id: number, ) => api.post(`/sys/roles/${role_id}/users/${user_id}`),
+  //删除角色用户
+  deleteRoleUsers: (role_id: number, user_id: number) => api.delete(`/sys/roles/${role_id}/users/${user_id}`),
   // 新增角色信息
   postRoleInfo: (data: any) => api.post(`/sys/roles`, data),
   // 删除角色信息

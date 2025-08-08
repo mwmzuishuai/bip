@@ -19,7 +19,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '租户管理',
         icon: 'i-ant-design:UserSwitchOutlined',
-        // auth: ['sys:manage'],
+        auth: ['tenant:view'],
       },
     },
     {
@@ -29,6 +29,7 @@ const routes: RouteRecordRaw = {
       meta: {
         title: '菜单管理',
         icon: 'i-ant-design:MenuOutlined',
+        auth: ['tenant:package:view']
       },
     },
   ],

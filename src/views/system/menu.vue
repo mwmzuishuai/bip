@@ -219,7 +219,7 @@ onMounted(() => {
               </ElCol>
               <ElCol :span="6">
                 <ElFormItem label="类型">
-                  <ElSelect v-model="formMenu.type_id" clearable placeholder="请选择">
+                  <ElSelect v-model="formMenu.type" clearable placeholder="请选择">
                     <ElOption :value="0" label="目录" />
                     <ElOption :value="1" label="菜单" />
                     <ElOption :value="2" label="按钮" />

@@ -1,9 +1,8 @@
 import type { RouteRecordRaw } from 'vue-router'
-
 function Layout() {
   return import('@/layouts/index.vue')
 }
-
+// console.log(obj)
 const routes: RouteRecordRaw = {
   path: '/system',
   component: Layout,
@@ -24,6 +23,19 @@ const routes: RouteRecordRaw = {
         auth: ['sys:role:view'],
       },
     },
+    {
+      path:'role_users/:role_id',
+      name:'role_users',
+      component: () => import('@/views/system/role_users.vue'),
+      meta: {
+        title: '角色用户管理',
+        icon: 'i-ant-design:UserSwitchOutlined',
+
+        menu: false,
+        // auth: ['sys:role:view'],
+      },
+    },
+
     {
       path: 'menu',
       name: 'menus',

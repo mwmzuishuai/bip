@@ -10,8 +10,8 @@ const formTenant = ref({
   size: 10,
 })
 const auths = ref({
-  delete: auth('sys:user:delete'),
-  edit: auth('sys:user:edit'),
+  delete: auth('tenant:delete'),
+  edit: auth('tenant:edit'),
 })
 const menus = ref([])
 const columns = ref([
@@ -218,6 +218,12 @@ async function  putUserInfos(formEl){
           dtawerKey.value = false
           getTenantList()
         })
+      }else {
+        tenantApi.patchTenant(drwawerForm.value.id, drwawerForm.value).then(() => {
+          toast.success('修改成功')
+          dtawerKey.value = false
+          getTenantList()
+        })
       }
     }
   })
@@ -269,7 +275,7 @@ onMounted(()=>{
     </FaPageMain>
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
       <div class="m-[20px] m-b-4 flex">
-        <ElButton type="primary" @click="postUserInfos()">
+        <ElButton v-auth="['tenant:add']" type="primary" @click="postUserInfos()">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>
@@ -284,12 +290,12 @@ onMounted(()=>{
         <template #is_active="{ date }">
           <!-- {{ date }} -->
           <ElSwitch
-            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            v-model="date.is_active" :before-change="handleBeforeSwitchChange" :disabled="!auth(['tenant:edit'])" active-text="已启动" class="switch-container" inactive-text="已禁止"
             inline-prompt size="large" @change="handleSwitchChange(date)"
           />
         </template>
         <template #package="{ date }">
-          {{ date.package.name }}
+          {{ date.package?.name }}
         </template>
       </DataTable>
     </FaPageMain>

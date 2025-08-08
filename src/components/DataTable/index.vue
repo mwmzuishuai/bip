@@ -25,12 +25,12 @@ console.log(props)
 <template>
   <ElTable
     :key="key" ref="multipleTableRef" v-loading="props.loading" :data="props.dataList" :default-expand-all="props.defaultExpandAll" :row-key="props.rowKey"
-    height="100%" highlight-current-row stripe border
+    border height="100%" highlight-current-row stripe
     @selection-change="handleSelectionChange"
   >
     <ElTableColumn
-      v-for="(item, index) in props.columns" :key="index" :align="item.align" :label="item.label"
-      :prop="item.prop" :sortable="item.sortable" :type="item.type" :width="item.width"
+      v-for="(item, index) in props.columns" :key="index" :align="item.align" :fixed="item.fixed"
+      :label="item.label" :prop="item.prop" :sortable="item.sortable" :type="item.type" :width="item.width"
     >
       <template v-if="item.render" #default="scope">
         <slot :date="scope.row" :name="item.prop" />

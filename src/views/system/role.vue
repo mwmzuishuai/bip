@@ -10,12 +10,15 @@ import { toast } from 'vue-sonner'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
 import useAuth from '@/utils/composables/useAuth'
+import {useRouter} from 'vue-router'
 
+
+const router = useRouter()
 const addFormRef = ref(null)
 const { auth } = useAuth()
 const stystemStore = useStystemStore()
 const { menusTree } = storeToRefs(stystemStore)
-
+const loading = ref(false)
 const auths = ref({
   delete: auth('sys:role:delete'),
   edit: auth('sys:role:edit'),
@@ -55,6 +58,14 @@ const columns = ref([
     label: '备注',
     align: 'center',
   },
+  {
+    prop:'user_count',
+    label: '分配用户',
+    align: 'center',
+    fixed: 'right',
+    width: '200',
+    render: true,
+  },
 ])
 const dataList = ref([])
 const search = ref({
@@ -87,6 +98,7 @@ async function handleEdit(row) {
   const res = await api.getRoleInfo(row.id)
   patchForm.value = { ...row }
   stystemStore.getMenus()
+  treeKey.value = true
   selectedMenuIds.value = res.data.menu_ids
   roleDrawerKey.value = true
   roleTitle.value = '编辑角色'
@@ -173,15 +185,24 @@ function handleCurrentChange(val) {
 function addRole() {
   roleTitle.value = '添加角色'
   roleDrawerKey.value = true
+  treeKey.value = true
   patchForm.value = {}
+  stystemStore.getMenus()
   selectedMenuIds.value =[]
   treeRef.value.setCheckedKeys(selectedMenuIds.value)
 }
 // 获取角色列表
 function getRolelist() {
+  loading.value = true
   api.getRolelist(formRole.value).then((res) => {
     dataList.value = res.data.items
     pagination.value.total = res.data.total
+    loading.value = false
+  })
+}
+function routerRoleUser(row){
+  router.push({
+    path: `/system/role_users/${row.id}`,
   })
 }
 
@@ -215,6 +236,14 @@ async function saveRolePermissions(formEl) {
     }
   })
 }
+//重置
+function resetForm() {
+  formRole.value = {
+    page: 1,
+    size: 10,
+  }
+  getRolelist()
+}
 onMounted(() => {
   getRolelist()
   stystemStore.getMenus()
@@ -230,13 +259,11 @@ onMounted(() => {
         <template #default="{ fold }">
           <ElForm :model="formRole" label-width="120px" size="default" @keyup.enter="getRolelist">
             <ElRow>
-              <ElCol :span="12">
+              <ElCol :span="6">
                 <ElFormItem label="角色名称">
                   <ElInput v-model="formRole.name" clearable placeholder="请输入" />
                 </ElFormItem>
               </ElCol>
-            </ElRow>
-            <ElRow v-show="!fold">
               <ElCol :span="6">
                 <ElFormItem label="状态">
                   <ElSelect v-model="formRole.is_active" clearable placeholder="请选择">
@@ -245,6 +272,10 @@ onMounted(() => {
                   </ElSelect>
                 </ElFormItem>
               </ElCol>
+            </ElRow>
+
+            <ElRow v-show="!fold">
+
             </ElRow>
             <ElRow>
               <ElCol :span="20" />
@@ -255,7 +286,7 @@ onMounted(() => {
                   </template>
                   搜索
                 </ElButton>
-                <ElButton @click="search = { check1: true, check2: false }; getRolelist()">
+                <ElButton @click="resetForm()">
                   重置
                 </ElButton>
               </ElFormItem>
@@ -276,14 +307,23 @@ onMounted(() => {
         </ElButton>
       </div>
       <DataTable
-        :auth="auths" :columns="columns" :data-list="dataList" :operate="auths.delete || auths.edit" :pagination="pagination" @delete="handleDelete"
-        @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
+        :auth="auths" :columns="columns" :data-list="dataList" :loading="loading" :operate="auths.delete || auths.edit" :pagination="pagination"
+        @delete="handleDelete" @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
       >
         <template #is_active="{ date }">
           <ElSwitch
-            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            v-model="date.is_active" :before-change="handleBeforeSwitchChange" :disabled="!auth(['sys:role:edit'])" active-text="已启动" class="switch-container" inactive-text="已禁止"
             inline-prompt size="large" @change="handleSwitchChange(date)"
           />
+        </template>
+        <template #user_count="{ date }">
+          <ElTooltip content="分配用户">
+            <ElButton circle type="success" @click="routerRoleUser(date)">
+              <template #icon>
+                <FaIcon name="i-ep:Avatar" />
+              </template>
+            </ElButton>
+          </ElTooltip>
         </template>
       </DataTable>
     </FaPageMain>

@@ -446,7 +446,7 @@ watch(() => formUser.value, () => {
           <template #is_active="{ date }">
             <!-- {{ date }} -->
             <ElSwitch
-              v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+              v-model="date.is_active" :before-change="handleBeforeSwitchChange" :disabled="!auth(['sys:user:edit'])" active-text="已启动" class="switch-container" inactive-text="已禁止"
               inline-prompt size="large" @change="handleSwitchChange(date)"
             />
           </template>

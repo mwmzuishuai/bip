@@ -22,8 +22,8 @@ const formMenu = ref({
   size: 10,
 })
 const auths = ref({
-  delete: auth('sys:user:delete'),
-  edit: auth('sys:user:edit'),
+  delete: auth('tenant:package:delete'),
+  edit: auth('tenant:package:edit'),
 })
 const columns = ref([
   {
@@ -91,14 +91,25 @@ function reset() {
   }
 }
 // 删除
-function dalete() {}
+function dalete(data) {
+  ElMessageBox.confirm('是否确定删除?', '删除', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'error',
+  }).then(() => {
+    api.deletePackage(data.id).then(() => {
+      toast.success('删除成功')
+      getPackage()
+    })
+  })
+}
 // 编辑
 async function handleEdit(item) {
   dtawerKey.value = true
   titleDrawer.value = '编辑套餐'
+  stystemStore.getMenus()
   const res = await api.getPackageDetail(item.id)
   drwawerForm.value = res.data
-  console.log(res.data.menus)
   if (treeRef.value) {
     treeRef.value.setCheckedKeys(res.data.menus.map(item=>item.id))
   }
@@ -107,10 +118,14 @@ async function handleEdit(item) {
 function postUserInfos() {
   dtawerKey.value = true
   titleDrawer.value = '新增套餐'
+  stystemStore.getMenus()
   drwawerForm.value = {
     tenant_name: '',
     tenant_code: '',
     package_description: '',
+  }
+  if (treeRef.value) {
+    treeRef.value.setCheckedKeys([])
   }
 }
 // 页码切换
@@ -141,6 +156,18 @@ async function putUserInfos(formEl) {
         }
         api.patchPackage(drwawerForm.value.id,obj).then(() => {
           toast.success('修改成功')
+          dtawerKey.value = false
+          getPackage()
+        })
+      }else{
+        const obj = {
+          is_active:drwawerForm.value.is_active,
+          name:drwawerForm.value.name,
+          remark:drwawerForm.value.remark,
+          menu_ids: [...treeRef.value.getHalfCheckedKeys(), ...treeRef.value.getCheckedKeys()],
+        }
+        api.addPackage(obj).then(() => {
+          toast.success('新增成功')
           dtawerKey.value = false
           getPackage()
         })
@@ -213,7 +240,7 @@ onMounted(()=>{
     </FaPageMain>
     <FaPageMain class="flex-1 overflow-auto" main-class="flex-1 flex flex-col overflow-auto">
       <div class="m-[20px] m-b-4 flex">
-        <ElButton type="primary" @click="postUserInfos()">
+        <ElButton v-auth="['tenant:package:add']" type="primary" @click="postUserInfos()">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>
@@ -228,7 +255,7 @@ onMounted(()=>{
         <template #is_active="{ date }">
           <!-- {{ date }} -->
           <ElSwitch
-            v-model="date.is_active" :before-change="handleBeforeSwitchChange" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            v-model="date.is_active" :before-change="handleBeforeSwitchChange" :disabled="!auth(['tenant:package:edit'])" active-text="已启动" class="switch-container" inactive-text="已禁止"
             inline-prompt size="large" @change="handleSwitchChange(date)"
           />
         </template>
@@ -290,6 +317,7 @@ onMounted(()=>{
   flex-direction: column;
   width: 100%;
   height: 100%;
+  transform: r;
 }
 .switch-container {
   --el-switch-on-color: #1b9cfc;
