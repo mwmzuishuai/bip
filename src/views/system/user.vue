@@ -274,7 +274,7 @@ function getUserInfos(id) {
       phone: res.data.phone,
       avatar: res.data.avatar,
       is_active: res.data.is_active,
-      dept_ids: res.data.depts.map(i => i.id),
+      dept_id: res.data.dept_id,
       role_ids: res.data.roles.map(r => r.id),
     }
   })
@@ -481,7 +481,7 @@ watch(() => formUser.value, () => {
                 <ElCol :span="12">
                   <ElFormItem label="归属部门" prop="dept_id">
                     <ElTreeSelect
-                      v-model="drwawerForm.dept_ids" :data="deptsTreeTvalue"  check-strictly clearable filterable multiple
+                      v-model="drwawerForm.dept_id" :data="deptsTreeTvalue"  check-strictly clearable filterable
                       placeholder="请选择"
                     />
                   </ElFormItem>
