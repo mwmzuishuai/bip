@@ -10,7 +10,7 @@ import { toast } from 'vue-sonner'
 import api from '@/api/modules/system'
 import useStystemStore from '@/store/modules/system'
 import useAuth from '@/utils/composables/useAuth'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 
 const router = useRouter()
@@ -59,7 +59,7 @@ const columns = ref([
     align: 'center',
   },
   {
-    prop:'user_count',
+    prop: 'user_count',
     label: '分配用户',
     align: 'center',
     fixed: 'right',
@@ -131,7 +131,7 @@ async function handleDelete(val) {
   catch (error) {
     // 错误处理（用户取消删除或API请求失败）
     // if (error !== 'cancel' && error !== 'close') {
-      toast.error('删除失败')
+    toast.error('删除失败')
     // }
   }
 }
@@ -188,7 +188,7 @@ function addRole() {
   treeKey.value = true
   patchForm.value = {}
   stystemStore.getMenus()
-  selectedMenuIds.value =[]
+  selectedMenuIds.value = []
   treeRef.value.setCheckedKeys(selectedMenuIds.value)
 }
 // 获取角色列表
@@ -200,7 +200,7 @@ function getRolelist() {
     loading.value = false
   })
 }
-function routerRoleUser(row){
+function routerRoleUser(row) {
   router.push({
     path: `/system/role_users/${row.id}`,
   })
@@ -306,15 +306,13 @@ onMounted(() => {
           新增
         </ElButton>
       </div>
-      <DataTable
-        :auth="auths" :columns="columns" :data-list="dataList" :loading="loading" :operate="auths.delete || auths.edit" :pagination="pagination"
-        @delete="handleDelete" @edit="handleEdit" @current-change="handleCurrentChange" @size-change="handleSizeChange"
-      >
+      <DataTable :auth="auths" :columns="columns" :data-list="dataList" :loading="loading"
+        :operate="auths.delete || auths.edit" :pagination="pagination" @delete="handleDelete" @edit="handleEdit"
+        @current-change="handleCurrentChange" @size-change="handleSizeChange">
         <template #is_active="{ date }">
-          <ElSwitch
-            v-model="date.is_active" :before-change="handleBeforeSwitchChange" :disabled="!auth(['sys:role:edit'])" active-text="已启动" class="switch-container" inactive-text="已禁止"
-            inline-prompt size="large" @change="handleSwitchChange(date)"
-          />
+          <ElSwitch v-model="date.is_active" :before-change="handleBeforeSwitchChange"
+            :disabled="!auth(['sys:role:edit'])" active-text="已启动" class="switch-container" inactive-text="已禁止"
+            inline-prompt size="large" @change="handleSwitchChange(date)" />
         </template>
         <template #user_count="{ date }">
           <ElTooltip content="分配用户">
